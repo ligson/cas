@@ -1,0 +1,5 @@
+rootProject.name = 'cas'
+include 'ca_api'
+include 'ca_service'
+include 'ca_web'
+
