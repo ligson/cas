@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="GB2312"?>
+<CertTemplate>
+    <Version>3</Version>
+    <SerialHash>SHA1</SerialHash>
+    <MaxValidity>365</MaxValidity>
+    <DefaultValidity>365</DefaultValidity>
+    <OverlapPeriod>30</OverlapPeriod>
+    <!--主题项 -->
+    <Subject>
+        <DefaultEncode>PRINTABLE</DefaultEncode>
+        <Sub_Item Choice="Mandatory">
+            <Name>O</Name>
+            <Value>组织</Value>
+            <Encode>UTF8</Encode>
+        </Sub_Item>
+        <Sub_Item Choice="Mandatory">
+            <Name>OU</Name>
+            <Value>单位</Value>
+            <Encode>UTF8</Encode>
+        </Sub_Item>
+        <Sub_Item Choice="Mandatory">
+            <Name>CN</Name>
+            <Value>用户名</Value>
+            <Encode>UTF8</Encode>
+        </Sub_Item>
+        <Sub_Item Choice="Mandatory">
+            <Name>emailAddress</Name>
+            <Value>Email地址</Value>
+            <Encode>UTF8</Encode>
+        </Sub_Item>
+    </Subject>
+    <!--扩展信息-->
+    <Extension>
+        <Ext_Item Choice="Fixed">
+            <Name>basicConstraints</Name>
+            <Value>CA:true,pathlen:3</Value>
+        </Ext_Item>
+        <Ext_Item Choice="Fixed">
+            <Name>keyUsage</Name>
+            <Value>
+                digitalSignature,keyCertSign,nonRepudiation,cRLSign,keyEncipherment,encipherOnly,dataEncipherment,decipherOnly,keyAgreement
+            </Value>
+        </Ext_Item>
+        <Ext_Item Choice="Mandatory">
+            <Name>nsCertType</Name>
+            <Value>
+                digitalSignature,keyCertSign,nonRepudiation,cRLSign,keyEncipherment,encipherOnly,dataEncipherment,decipherOnly,keyAgreement,client,server,sslCA,email,emailCA,objsign,objCA
+            </Value>
+        </Ext_Item>
+        <Ext_Item Choice="Mandatory">
+            <Name>extendedKeyUsage</Name>
+            <Value>
+                serverAuth,clientAuth,codeSigning,emailProtection,timeStamping,OCSPSigning,msCodeCom,msCTLSign,msSGC,msEFS,nsSGC,deltaCRL,CRLReason,invalidityDate,SXNetID
+            </Value>
+        </Ext_Item>
+        <Ext_Item Choice="Mandatory">
+            <Name>AuthorityInfoAccess</Name>
+            <Value>http://Your_Server_Name:Port/TopCA/lodp_BaseDN</Value>
+        </Ext_Item>
+        <Ext_Item Choice="Mandatory">
+            <Name>freshestCRL</Name>
+            <Value>FULLNAMES:URI:http://Your_Server_Name:Port/TopCA/public/itruscrl?CA=$$CA_SERIALNUMBER$$</Value>
+        </Ext_Item>
+        <Ext_Item Choice="Mandatory">
+            <Name>crlDistributionPoints</Name>
+            <Value>FULLNAMES:URI:http://Your_Server_Name:Port/TopCA/public/itruscrl?CA=$$CA_SERIALNUMBER$$</Value>
+        </Ext_Item>
+    </Extension>
+    <!--签名哈希-->
+    <SignatureHash>SHA1</SignatureHash>
+    <KeyLength>
+        <Value>1024</Value>
+    </KeyLength>
+    <PublicKey>
+        <Arithmetic>RSA</Arithmetic>
+    </PublicKey>
+</CertTemplate>

@@ -6,6 +6,8 @@ ext {
     freemarkerVersion = "2.3.23"
 }
 dependencies {
+    compile project(":ca_api")
+    compile project(":fw_core")
     //mysql driver
     compile "mysql:mysql-connector-java:${mysqlVersion}"
     //freemarker
