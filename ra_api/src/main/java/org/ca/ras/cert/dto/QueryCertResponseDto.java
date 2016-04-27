@@ -1,6 +1,6 @@
 package org.ca.ras.cert.dto;
 
-import org.ca.cas.cert.vo.Cert;
+import org.ca.ras.cert.vo.Cert;
 import org.ligson.fw.core.facade.base.dto.BaseQueryPageResponseDto;
 
 import java.util.ArrayList;

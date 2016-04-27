@@ -1,97 +1,52 @@
 package org.ligson.fw.core.dao;
 
-import org.ligson.fw.core.entity.Pagination;
+
+import org.ligson.fw.core.common.crud.ICommonQuery;
 import org.ligson.fw.core.entity.BasicEntity;
 
-import java.util.List;
-
-
-/**
- * 描述: 通用数据库操作DAO接口类，该类实现了常用的数据库操作
+/***
+ * hibernate dao封装
  *
- * @version V1.0
+ * @param <T>
  */
-@SuppressWarnings("rawtypes")
-public interface BaseDao<E extends BasicEntity> {
-
-    /**
-     * 描述: 系统默认更新实体信息
-     *
-     * @param entity 需要更新的实体信息
-     * @return 更新的记录数
-     */
-    Integer update(E entity);
-
-    /**
-     * 描述: 系统默认删除满足条件的实体信息
-     *
-     * @param entity 需要删除的实体条件信息
-     * @return 删除的记录数
-     */
-    Integer delete(E entity);
-
-    /**
-     * 描述: 系统默认插入实体信息
-     *
-     * @param entity 需要插入的实体信息
-     * @return 插入的记录数
-     */
-    Integer insert(E entity);
+public interface BaseDao<T extends BasicEntity> extends ICommonQuery<T> {
 
     /***
-     * @param primaryKey 主键
-     * @return 实体对象
-     */
-    E get(Object primaryKey);
-
-    /**
-     * 描述: 系统默认根据主键查询唯一记录
+     * save操作
      *
-     * @param entity 实体参数查询条件（需包含主键信息）
-     * @return 查询结果
+     * @param t 实体
+     * @return id
      */
-    E findBy(E entity);
-
-    /**
-     * 描述: 系统默认根据实体参数查询满足条件的记录
-     *
-     * @param entity 实体参数查询条件
-     * @return 查询结果
-     */
-    List<E> findAllBy(E entity);
+    long add(T t);
 
     /***
-     * 按照条件统计
+     * save or update 操作
      *
-     * @param entity 实体参数查询条件
-     * @return 查询结果
+     * @param t 实体
      */
-    Integer countBy(E entity);
-
-
-    /**
-     * 描述: 批量插入实体信息
-     *
-     * @param entityList 需要批量插入的实体信息
-     * @return 插入的记录数
-     */
-    int batchInsert(List<E> entityList);
-
-    /**
-     * 描述: 批量更新实体信息
-     *
-     * @param entityList 需要批量更新的实体信息
-     * @return 更新的记录数
-     */
-    int batchUpdate(List<E> entityList);
+    void saveOrUpdate(T t);
 
     /***
-     * 分页查询
+     * 删除操作
      *
-     * @param entity 查询条件
-     * @return 查询结果
+     * @param t 实体
      */
-    Pagination<E> getPaginationList(E
-                                            entity);
+    void delete(T t);
+
+    /***
+     * 更新操作
+     *
+     * @param t 实体
+     */
+    void update(T t);
+
+    /***
+     * 更新某一个属性
+     *
+     * @param property      属性名
+     * @param propertyValue 属性值
+     * @param id            实体id
+     */
+    void updateProperty(String property, String propertyValue, long id);
 
 }

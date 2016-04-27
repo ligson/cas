@@ -1,27 +1,16 @@
 package org.ligson.fw.core.service;
 
 
+import org.ligson.fw.core.common.crud.ICommonQuery;
 import org.ligson.fw.core.entity.BasicEntity;
-import org.ligson.fw.core.entity.Pagination;
-
 
 /**
- * Created by ligson on 2016/3/21.
- * 通用接口代码
+ * Created by ligson on 2016/4/11.
  */
-public interface BaseService<T extends BasicEntity> {
-
-    T get(Object primaryKey);
-
-    Pagination<T> findAllBy(T t);
-
-    T findBy(T t);
-
-    int countBy(T t);
+public interface BaseService<T extends BasicEntity> extends ICommonQuery<T> {
+    void add(T t);
 
     void delete(T t);
 
     void update(T t);
-
-    void add(T t);
 }

@@ -1,251 +1,193 @@
 package org.ligson.fw.core.dao.impl;
 
-
+import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.ligson.fw.core.dao.BaseDao;
-import org.ligson.fw.core.entity.BasePageDto;
-import org.ligson.fw.core.entity.Pagination;
 import org.ligson.fw.core.entity.BasicEntity;
-import org.mybatis.spring.SqlSessionTemplate;
+import org.ligson.fw.core.entity.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
+@Repository("baseDao")
+public class BaseDaoImpl<T extends BasicEntity> implements BaseDao<T> {
 
-@Repository
-public class BaseDaoImpl<E extends BasicEntity> implements BaseDao<E> {
+    private static final Logger logger = LoggerFactory.getLogger(BaseDaoImpl.class);
 
-    public static final Logger log = LoggerFactory.getLogger(BaseDaoImpl.class);
-
-    private static final String pageSuffix = "Mapper.getPaginationList";
-    private static final String pageCountSuffix = "-count";
-    private static final String getListSuffix = "Mapper.getList";
-    private static final String findBySuffix = "Mapper.findBy";
-    private static final String insertSuffix = "Mapper.insert";
-    private static final String updateSuffix = "Mapper.update";
-    private static final String deleteSuffix = "Mapper.delete";
-    private static final String batchUpdateSuffix = "Mapper.batchUpdate";
-    private static final String batchInsertSuffix = "Mapper.batchInsert";
-
-    /**
-     * 批量sql单次执行的数量
-     */
-    private static final int batchExecuteOnceCount = 300;
-    /**
-     * 运行环境的SessionTemplate
-     */
     @Autowired
-    protected SqlSessionTemplate userSqlSessionTemplate;
+    @Qualifier("mySessionFactory")
+    private SessionFactory sessionFactory;
 
-    /***
-     * 更新方法
-     *
-     * @param e 实体,主键不能为空
-     * @return 更新的记录数
-     */
+    @Transactional("transactionManager")
     @Override
-    public Integer update(E e) {
-        String statementName = e.getClass().getSimpleName() +
-                updateSuffix;
-        return userSqlSessionTemplate.update(statementName, e);
+    public long add(T t) {
+        return (long) currentSession().save(t);
     }
 
-    /***
-     * 删除记录
-     *
-     * @param e 实体条件
-     * @return 删除的记录数
-     */
+    @Transactional("transactionManager")
     @Override
-    public Integer delete(E e) {
-        String statementName = e.getClass().getSimpleName() +
-                deleteSuffix;
-        return userSqlSessionTemplate.update(statementName, e);
+    public void delete(T t) {
+        currentSession().delete(t);
     }
 
-    /***
-     * 插入记录
-     *
-     * @param e 实体
-     * @return 操作记录
-     */
+    @Transactional("transactionManager")
     @Override
-    public Integer insert(E e) {
-        String statementName = e.getClass().getSimpleName() +
-                insertSuffix;
-        return userSqlSessionTemplate.insert(statementName, e);
+    public void update(T t) {
+        currentSession().update(t);
+    }
+
+    @Transactional("transactionManager")
+    @Override
+    public Pagination<T> findAllBy(String propertyName, Object propertyValue,
+                                   T t) {
+        String hql;
+        if (propertyName == null) {
+            hql = "from " + this.getGenericTypeName();
+        } else {
+            if (propertyValue instanceof String) {
+
+                hql = "from " + this.getGenericTypeName() + " where "
+                        + propertyName + "='" + propertyValue + "'";
+            } else {
+
+                hql = "from " + this.getGenericTypeName() + " where "
+                        + propertyName + "=" + propertyValue;
+            }
+        }
+        return paginationQuery(t, hql);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public E get(Object id) {
+    public Pagination<T> findAllBy(String propertyName, Object propertyValue) {
         try {
-            Class clazz = getGenericType(0);
-            Object object = clazz.newInstance();
-            Method reflectKeyMethod = clazz.getMethod("primaryKey");
-            Method reflectKeyTypeMethod = clazz.getMethod("primaryKeyType");
-            String primaryKey = reflectKeyMethod.invoke(object).toString();
-            String keyName = primaryKey.substring(0, 1).toUpperCase() + primaryKey.substring(1);
-            Class keyType = (Class) reflectKeyTypeMethod.invoke(object);
-            Method method = clazz.getDeclaredMethod("set" + keyName, keyType);
-            method.invoke(object, id);
-            return findBy((E) object);
+            Object obj = getGenericType(0).newInstance();
+            Method m = getGenericType(0).getMethod("setPageAble", boolean.class);
+            m.invoke(obj, false);
+            return findAllBy(propertyName, propertyValue, (T) obj);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return null;
-    }
-
-    /***
-     * 根据条件查询一条记录
-     *
-     * @param e 查询条件
-     * @return 查询的实体
-     */
-    @Override
-    public E findBy(E e) {
-        String statementName = e.getClass().getSimpleName() +
-                findBySuffix;
-        return userSqlSessionTemplate.selectOne(statementName, e);
-    }
-
-    /***
-     * 返回所有结果
-     *
-     * @param e 查询条件
-     * @return 返回所有结果
-     */
-    @Override
-    public List<E> findAllBy(E e) {
-        String statementName = e.getClass().getSimpleName() + getListSuffix;
-        return userSqlSessionTemplate.selectList(statementName, e);
-    }
-
-    @Override
-    public Integer countBy(E entity) {
-        return userSqlSessionTemplate.selectOne(entity.getClass().getSimpleName() + "Mapper.countBy", entity);
-    }
-
-    /***
-     * 批量插入记录
-     *
-     * @param basicEntityList 列表
-     * @return 插入成功的记录数
-     */
-    @Override
-    public int batchInsert(List<E> basicEntityList) {
-        //每次I/O提交数量
-        int singleNum = batchExecuteOnceCount;
-        //sql执行影响数据行数
-        int affectedRows = 0;
-        try {
-            if (basicEntityList != null && basicEntityList.size() > 0) {
-                String statementName = basicEntityList.get(0).getClass().getSimpleName();
-                statementName = statementName + batchInsertSuffix;
-                int rowSize = basicEntityList.size();//数据总量
-                int fromIndex = 0;//起始序号
-                int endIndex = 0;//结束序号
-                log.debug("批量执行插入【" + statementName + "】开始：" + System.currentTimeMillis());
-                for (int i = 0; i == 0 || i < Math.ceil((double) (rowSize / singleNum)); i++) {
-                    endIndex = (i + 1) * singleNum;//默认结束序号滚动一页
-                    if (endIndex >= rowSize) {//如结束序号大于等于数据总量时，把数据总量赋值给结束序列
-                        endIndex = rowSize;
-                    }
-                    log.debug("批量执行插入【" + statementName + "】第【" + (i + 1) + "】次共【" + (endIndex - fromIndex) + "】条记录开始：" + System.currentTimeMillis());
-                    affectedRows += userSqlSessionTemplate.insert(statementName, basicEntityList.subList(fromIndex, endIndex));
-                    log.debug("批量执行插入【" + statementName + "】第【" + (i + 1) + "】次共【" + (endIndex - fromIndex) + "】条记录结束：" + System.currentTimeMillis());
-                    fromIndex = endIndex;
-                }
-                log.debug("批量执行插入【" + statementName + "】结束：" + System.currentTimeMillis());
-            }
-        } catch (Exception e) {
-            log.error("系统批量插入数据出错：", e);
-            throw new RuntimeException(e);
-        }
-        return affectedRows;
-    }
-
-    /***
-     * 批量更新记录
-     *
-     * @param basicEntityList 批量更新记录
-     * @return 批量更新记录
-     */
-    @Override
-    public int batchUpdate(List<E> basicEntityList) {
-        //每次I/O提交数量
-        int singleNum = batchExecuteOnceCount;
-        //sql执行影响数据行数
-        int affectedRows = 0;
-        try {
-            if (basicEntityList != null && basicEntityList.size() > 0) {
-                String statementName = basicEntityList.get(0).getClass().getSimpleName();
-                statementName = statementName + batchUpdateSuffix;
-                int rowSize = basicEntityList.size();//数据总量
-                int fromIndex = 0;//起始序号
-                int endIndex = 0;//结束序号
-                log.debug("批量执行更新【" + statementName + "】开始：" + System.currentTimeMillis());
-                for (int i = 0; i == 0 || i < Math.ceil(Double.valueOf(Integer.valueOf(rowSize / singleNum))); i++) {
-                    endIndex = (i + 1) * singleNum;//默认结束序号滚动一页
-                    if (endIndex >= rowSize) {//如结束序号大于等于数据总量时，把数据总量赋值给结束序列
-                        endIndex = rowSize;
-                    }
-                    log.debug("批量执行更新【" + statementName + "】第【" + (i + 1) + "】次共【" + (endIndex - fromIndex) + "】条记录开始：" + System.currentTimeMillis());
-                    affectedRows += userSqlSessionTemplate.update(statementName, basicEntityList.subList(fromIndex, endIndex));
-                    log.debug("批量执行更新【" + statementName + "】第【" + (i + 1) + "】次共【" + (endIndex - fromIndex) + "】条记录结束：" + System.currentTimeMillis());
-                    fromIndex = endIndex;
-                }
-                log.debug("批量执行更新【" + statementName + "】结束：" + System.currentTimeMillis());
-            }
-        } catch (Exception e) {
-            log.error("系统批量更新数据出错：", e);
-            throw new RuntimeException(e);
-        }
-        return affectedRows;
-    }
-
-    /*
-    *
-    * desc:
-    * (non-Javadoc)
-    */
-    @Override
-    public Pagination<E> getPaginationList(E e) {
-        BasePageDto basePageDto = null;
-        if (e != null) {
-            basePageDto = e;
-        }
-        if (basePageDto == null) {
             return null;
         }
-        /**
-         * 判断pageNum和pageSize
-         */
-        if (basePageDto.getPageNum() == null || basePageDto.getPageNum() < 1) {
-            basePageDto.setPageNum(1);
-        }
-        if (basePageDto.getMax() == null || basePageDto.getMax() <
-                1) {
-            basePageDto.setMax(10);
-        }
+    }
 
-        String clzName = basePageDto.getClass().getSimpleName();
-        String countStatementName = clzName + pageSuffix +
-                pageCountSuffix;
-        String statementName = clzName + pageSuffix;
-        // 计算记录起始值和结束值
-        Integer totalCount = userSqlSessionTemplate.selectOne
-                (countStatementName, basePageDto);
-        log.debug(statementName);
-        List<E> resultList = userSqlSessionTemplate.selectList(statementName, basePageDto);
+    @Transactional("transactionManager")
+    @Override
+    public long countBy(String propertyName, Object propertyValue) {
+        String hql;
+        if (propertyName == null) {
+            hql = "select  count(*) from " + this.getGenericTypeName();
+            logger.debug("----");
+        } else {
+            if (propertyValue instanceof String) {
+                hql = "select  count(*) from " + this.getGenericTypeName() + " where "
+                        + propertyName + "='" + propertyValue + "'";
+            } else {
+                hql = "select  count(*) from " + this.getGenericTypeName() + " where "
+                        + propertyName + "=" + propertyValue;
+            }
+        }
+        Query query = currentSession().createQuery(hql);
+        Long count = (Long) query.uniqueResult();
+        return count.intValue();
+    }
 
-        return new Pagination<>(basePageDto.getMax(), basePageDto.getPageNum(),
-                totalCount, resultList);
+    protected List<String> getNotNullPropNameList(T t) {
+        Field[] props = t.getClass().getDeclaredFields();
+        List<String> propNames = new ArrayList<String>();
+        for (Field field : props) {
+            try {
+                String getMethodName;
+                if (field.getType() == boolean.class) {
+                    getMethodName = "is" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                } else {
+                    getMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                }
+                Object value = t.getClass().getDeclaredMethod(getMethodName).invoke(t);
+                if (value != null) {
+                    propNames.add(field.getName());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return propNames;
+    }
+
+    protected List<Object> getNotNullPropValueList(T t) {
+        Field[] props = t.getClass().getDeclaredFields();
+        List<Object> propValues = new ArrayList<>();
+        for (Field field : props) {
+            try {
+                String getMethodName;
+                if (field.getType() == boolean.class) {
+                    getMethodName = "is" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                } else {
+                    getMethodName = "get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                }
+                Object value = t.getClass().getDeclaredMethod(getMethodName).invoke(t);
+                if (value != null) {
+                    propValues.add(value);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return propValues;
+    }
+
+    protected String entityToSql(T t, String and, String relation) {
+        List<String> propNames = getNotNullPropNameList(t);
+        List<Object> propValues = getNotNullPropValueList(t);
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < propNames.size(); i++) {
+            String propName = propNames.get(i);
+            Object propValue = propValues.get(i);
+            if (propValue instanceof String) {
+                builder.append(" ").append(and).append(" ").append(propName).append(relation).append("'").append(propValue).append("'");
+            } else {
+                builder.append(" ").append(and).append(" ").append(propName).append(relation).append(propValue);
+            }
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public long countByAnd(T t) {
+        String hql = " select count(*) from " + getGenericTypeName() +
+                " where 1=1 " + entityToSql(t, "and", "=");
+        return (Long) currentSession().createQuery(hql).uniqueResult();
+    }
+
+    @Override
+    public long countAll() {
+        String hql = "select count(*) from " + getGenericTypeName();
+        return (Long) currentSession().createQuery(hql).uniqueResult();
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    public Session currentSession() {
+        // System.out.println("》》》》》当前线程："+Thread.currentThread().getName()+":"+Thread.currentThread().getId());
+        return getSessionFactory().getCurrentSession();
     }
 
     @SuppressWarnings("rawtypes")
@@ -264,5 +206,235 @@ public class BaseDaoImpl<E extends BasicEntity> implements BaseDao<E> {
         return (Class) params[index];
     }
 
-}
+    private String getGenericTypeName() {
+        return getGenericType(0).getSimpleName();
+    }
 
+    @Transactional("transactionManager")
+    @Override
+    public T findBy(String propertyName, Object propertyValue) {
+        String hql;
+        if (propertyValue instanceof String) {
+            hql = "from " + this.getGenericTypeName() + " where "
+                    + propertyName + "='" + propertyValue + "'";
+        } else {
+
+            hql = "from " + this.getGenericTypeName() + " where "
+                    + propertyName + "=" + propertyValue;
+        }
+        Query query = currentSession().createQuery(hql);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<T> list = query.list();
+        if (list.size() > 0) {
+            return list.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public T findByAnd(T t) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(t, "and", "=");
+        Query query = currentSession().createQuery(hql);
+        query.setFirstResult(0);
+        query.setMaxResults(1);
+        List<T> list = query.list();
+        if (CollectionUtils.isNotEmpty(list)) {
+            return list.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    protected Pagination<T> paginationQuery(T t, String hql) {
+        Query query = currentSession().createQuery(hql);
+        Pagination<T> pagination;
+        if (t.getPageAble()) {
+            query.setFirstResult(t.getOffset());
+            query.setMaxResults(t.getMax());
+            List<T> list = query.list();
+            String countHql = "select count(*) " + hql;
+            query = currentSession().createQuery(countHql);
+            Long count = (Long) query.uniqueResult();
+            pagination = new Pagination<T>(t.getOffset(), t.getMax(), count.intValue(), 0, list);
+        } else {
+            List<T> list = query.list();
+            pagination = new Pagination<>(list);
+        }
+        return pagination;
+    }
+
+    @Override
+    public Pagination<T> findAllByEqAnd(T eqT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(eqT, "and", "=");
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByNeAnd(T neT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(neT, "and", "<>");
+        return paginationQuery(neT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByLkAnd(T lkT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(lkT, "and", "like");
+        return paginationQuery(lkT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByGeAnd(T geT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(geT, "and", ">=");
+        return paginationQuery(geT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByGtAnd(T gtT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(gtT, "and", ">");
+        return paginationQuery(gtT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByLeAnd(T leT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(leT, "and", "<=");
+        return paginationQuery(leT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByLtAnd(T ltT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(ltT, "and", "<");
+        return paginationQuery(ltT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByEqOr(T eqT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(eqT, "or", "=");
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByNeOr(T neT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(neT, "or", "<>");
+        return paginationQuery(neT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByLikeOr(T lkT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(lkT, "or", "like");
+        return paginationQuery(lkT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByGeOr(T geT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(geT, "or", ">=");
+        return paginationQuery(geT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByGtOr(T gtT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(gtT, "or", ">");
+        return paginationQuery(gtT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByLeOr(T leT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(leT, "or", "<=");
+        return paginationQuery(leT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByLtOr(T ltT) {
+        String hql = " from " + getGenericTypeName() + " where 1=1 " + entityToSql(ltT, "or", "<");
+        return paginationQuery(ltT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByEqAndNe(T eqT, T neT) {
+        String hql = " from " + getGenericTypeName() + " where (1=1 " + entityToSql(eqT, "and", "=") + ") and (1=1 " + entityToSql(neT, "and", "<>") + ")";
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByEqAndLe(T eqT, T neT) {
+        String hql = " from " + getGenericTypeName() + " where (1=1 " + entityToSql(eqT, "and", "=") + ") and (1=1 " + entityToSql(neT, "and", "<=") + ")";
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByEqAndLt(T eqT, T neT) {
+        String hql = " from " + getGenericTypeName() + " where (1=1 " + entityToSql(eqT, "and", "=") + ") and (1=1 " + entityToSql(neT, "and", "<") + ")";
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByEqAndGe(T eqT, T neT) {
+        String hql = " from " + getGenericTypeName() + " where (1=1 " + entityToSql(eqT, "and", "=") + ") and (1=1 " + entityToSql(neT, "and", ">=") + ")";
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public Pagination<T> findAllByEqAndGt(T eqT, T neT) {
+        String hql = " from " + getGenericTypeName() + " where (1=1 " + entityToSql(eqT, "and", "=") + ") and (1=1 " + entityToSql(neT, "and", ">") + ")";
+        return paginationQuery(eqT, hql);
+    }
+
+    @Override
+    public T get(long id) {
+        return (T) currentSession().get(getGenericType(0), id);
+    }
+
+    @Transactional("transactionManager")
+    @Override
+    public void updateProperty(String property, String propertyValue, long id) {
+        String hql;
+        if (propertyValue instanceof String) {
+            hql = "update " + this.getGenericTypeName() + " set " + property
+                    + "='" + propertyValue + "' where id='" + id + "'";
+        } else {
+            hql = "update " + this.getGenericTypeName() + " set " + property
+                    + "=" + propertyValue + "' where id='" + id + "'";
+        }
+        Query query = currentSession().createQuery(hql);
+        query.executeUpdate();
+    }
+
+    @Override
+    public boolean propertyIsUnique(String property, Object propertyValue) {
+        // TODO Auto-generated method stub
+        long count = countBy(property, propertyValue);
+        return count == 0;
+    }
+
+    @Override
+    public List<T> list(int offset, int max) {
+        return list(offset, max, null, null);
+    }
+
+    @Override
+    public List<T> list(int offset, int max, String sort, String order) {
+        String hql = "from " + getGenericTypeName();
+        if (sort != null && order != null) {
+            hql = hql + " order by " + sort + " " + order;
+        }
+        Query query = currentSession().createQuery(hql);
+        if (offset >= 0 && max >= 0) {
+            query.setFirstResult(offset);
+            query.setMaxResults(max);
+        }
+        return query.list();
+    }
+
+    @Override
+    public List<T> list() {
+        return list(-1, -1, null, null);
+    }
+
+
+    @Transactional("transactionManager")
+    @Override
+    public void saveOrUpdate(T t) {
+        currentSession().saveOrUpdate(t);
+    }
+
+}

@@ -1,9 +1,11 @@
 package org.ca.ras.user.api;
 
-import org.ca.cas.user.dto.QueryUserRequestDto;
-import org.ca.cas.user.dto.QueryUserResponseDto;
-import org.ca.cas.user.dto.RegisterRequestDto;
-import org.ca.cas.user.dto.RegisterResponseDto;
+import org.ca.ras.cert.dto.LoginRequestDto;
+import org.ca.ras.cert.dto.LoginResponseDto;
+import org.ca.ras.user.dto.QueryUserRequestDto;
+import org.ca.ras.user.dto.QueryUserResponseDto;
+import org.ca.ras.user.dto.RegisterRequestDto;
+import org.ca.ras.user.dto.RegisterResponseDto;
 import org.ligson.fw.core.facade.base.result.Result;
 
 /**
@@ -14,4 +16,6 @@ public interface UserApi {
     Result<RegisterResponseDto> register(RegisterRequestDto requestDto);
 
     Result<QueryUserResponseDto> query(QueryUserRequestDto requestDto);
+
+    Result<LoginResponseDto> login(LoginRequestDto requestDto);
 }

@@ -4,12 +4,19 @@ version '1.0-SNAPSHOT'
 ext {
     mysqlVersion = "5.1.29"
     freemarkerVersion = "2.3.23"
+    dubboVersion = "2.5.3"
+    zkclientVersion = "0.4"
 }
 dependencies {
     compile project(":ra_api")
     compile project(":fw_core")
+    //compile project(":ca_api")
     //mysql driver
     compile "mysql:mysql-connector-java:${mysqlVersion}"
     //freemarker
     compile "org.freemarker:freemarker:${freemarkerVersion}"
+
+    //dubbo
+    compile "com.alibaba:dubbo:${dubboVersion}"
+    compile "com.101tec:zkclient:${zkclientVersion}"
 }

@@ -1,30 +1,68 @@
 package org.ligson.fw.core.entity;
 
-import java.math.BigInteger;
 
 /**
- * Created by ligso on 2016/1/27.
- * 基本类
- *
- * @author ligson
+ * Created by ligson on 2016/4/11.
  */
-//@SuppressWarnings("unused")
-public class BasicEntity extends BasePageDto {
-
+public class BasicEntity {
+    private String sort;
+    private String order;
+    private Integer offset = 0;
+    private Integer max = 10;
+    private Integer totalCount = 0;
+    private Integer pageCount = 0;
     /***
-     * 是否要分页
+     * 是否需要分页
      */
     private Boolean pageAble = true;
 
-    /***
-     * 排序字段
-     */
-    private String sort = "id";
+    public String getSort() {
+        return sort;
+    }
 
-    /***
-     * 排序顺序
-     */
-    private String order = "ASC";
+    public void setSort(String sort) {
+        this.sort = sort;
+    }
+
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
+    public Integer getMax() {
+        return max;
+    }
+
+    public void setMax(Integer max) {
+        this.max = max;
+    }
+
+    public Integer getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public Integer getPageCount() {
+        return pageCount;
+    }
+
+    public void setPageCount(Integer pageCount) {
+        this.pageCount = pageCount;
+    }
 
     public Boolean getPageAble() {
         return pageAble;
@@ -32,23 +70,5 @@ public class BasicEntity extends BasePageDto {
 
     public void setPageAble(Boolean pageAble) {
         this.pageAble = pageAble;
-    }
-
-    /***
-     * 主键字段
-     *
-     * @return 主键名
-     */
-    public String primaryKey() {
-        return "id";
-    }
-
-    /***
-     * 主键类型
-     *
-     * @return 主键类型
-     */
-    public Class primaryKeyType() {
-        return BigInteger.class;
     }
 }
