@@ -1,6 +1,7 @@
 package org.ligson.fw.core.dao.impl;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -11,13 +12,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.orm.hibernate5.SessionHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,8 +37,10 @@ public class BaseDaoImpl<T extends BasicEntity> implements BaseDao<T> {
 
     @Transactional("transactionManager")
     @Override
-    public long add(T t) {
-        return (long) currentSession().save(t);
+    public BigInteger add(T t) {
+        BigInteger id = (BigInteger) currentSession().save(t);
+        currentSession().flush();
+        return id;
     }
 
     @Transactional("transactionManager")
@@ -186,8 +192,24 @@ public class BaseDaoImpl<T extends BasicEntity> implements BaseDao<T> {
     }
 
     public Session currentSession() {
+
         // System.out.println("》》》》》当前线程："+Thread.currentThread().getName()+":"+Thread.currentThread().getId());
-        return getSessionFactory().getCurrentSession();
+        Session session = null;
+        try {
+            session = getSessionFactory().getCurrentSession();
+        } catch (HibernateException exception) {
+            //防止当前事务没有绑定session
+            Object object = TransactionSynchronizationManager.getResource(getSessionFactory());
+            if (object == null) {
+                session = getSessionFactory().openSession();
+                TransactionSynchronizationManager.bindResource(getSessionFactory(), new SessionHolder(session));
+            } else {
+                SessionHolder sessionHolder = (SessionHolder) object;
+                session = sessionHolder.getSession();
+            }
+        }
+        return session;
+
     }
 
     @SuppressWarnings("rawtypes")

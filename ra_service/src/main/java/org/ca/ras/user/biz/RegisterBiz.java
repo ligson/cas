@@ -1,5 +1,6 @@
 package org.ca.ras.user.biz;
 
+import org.ca.common.user.enums.UserState;
 import org.ca.ras.user.domain.UserEntity;
 import org.ca.ras.user.dto.RegisterRequestDto;
 import org.ca.ras.user.dto.RegisterResponseDto;
@@ -84,6 +85,7 @@ public class RegisterBiz extends AbstractBiz<RegisterRequestDto, RegisterRespons
     public Boolean txnPreProcessing() {
         UserEntity entity = new UserEntity();
         BeanUtils.copyProperties(requestDto, entity);
+        entity.setStatus(UserState.VALID.getCode());
         context.setAttr("entity", entity);
         return true;
     }
@@ -92,6 +94,8 @@ public class RegisterBiz extends AbstractBiz<RegisterRequestDto, RegisterRespons
     public Boolean persistence() {
         UserEntity entity = (UserEntity) context.getAttr("entity");
         userService.add(entity);
+        responseDto.setId(entity.getId());
+        setSuccessResult();
         return true;
     }
 

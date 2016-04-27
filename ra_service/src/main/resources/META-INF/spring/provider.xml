@@ -14,7 +14,7 @@
     <dubbo:registry protocol="${dubbo.registry.protocol}" address="${dubbo.registry.address}"
                     register="${dubbo.registry.enable}"/>
     <dubbo:protocol name="dubbo" port="${dubbo.protocol.port}"/>
-    <dubbo:provider timeout="${dubbo.provider.timeout}"/>
+    <dubbo:provider timeout="${dubbo.provider.timeout}" filter="invokeFilter"/>
 
     <!-- 用户 -->
     <dubbo:service interface="org.ca.ras.user.api.UserApi"
@@ -23,7 +23,7 @@
           class="org.ca.ras.user.facade.UserApiImpl"/>
     <!--证书-->
     <dubbo:service interface="org.ca.ras.cert.api.CertApi"
-                   ref="userApi" version="${dubbo.iterface.version}"/>
+                   ref="certApi" version="${dubbo.iterface.version}"/>
     <bean id="certApi"
           class="org.ca.ras.cert.facade.CertApiImpl"/>
 

@@ -2,7 +2,6 @@ group 'org.ligson.fw'
 version '1.0-SNAPSHOT'
 
 ext {
-    springVersion = "4.2.4.RELEASE"
     aspectjVersion = "1.8.8"
     mybatisVersion = "3.2.8"
     mybatisSpringVersion = "1.2.1"
@@ -28,9 +27,6 @@ dependencies {
 
     //druid
     compile "com.alibaba:druid:${druidVersion}"
-
-    //spring-boot
-    compile "org.springframework.boot:spring-boot-starter:${springBootVersion}"
 
     //hibernate
     compile "org.hibernate:hibernate-entitymanager:${hibernateVerion}"

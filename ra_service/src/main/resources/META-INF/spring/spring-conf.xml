@@ -17,6 +17,8 @@
 
     <context:annotation-config/>
     <context:component-scan base-package="org.ca.ras"/>
+    <context:component-scan base-package="org.ligson.fw.core"/>
+
     <context:property-placeholder location="classpath:*.properties" ignore-unresolvable="true"/>
     <util:properties id="cfg" location="classpath:config.properties"/>
     <util:properties id="dubboCofig" location="classpath:dubbo.properties"/>
@@ -27,11 +29,25 @@
         <property name="locations">
             <list>
                 <value>classpath:dubbo.properties</value>
+                <value>classpath:config.properties</value>
             </list>
         </property>
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
     <import resource="spring-hibernate.xml"/>
+
+    <!-- advisor=pointcut+advice -->
+    <bean id="invokeInterceptor" class="org.ca.ras.common.filter.MethodInvoker"/>
+    <bean id="methodInvokeAdvisor"
+          class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+        <property name="advice" ref="invokeInterceptor"/>
+        <property name="patterns">
+            <list>
+                <!-- 切入包名中含impl字符的类主要为了捕获实现接口的类 -->
+                <value>org.ca.ras.*.biz.*Biz.operation</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>

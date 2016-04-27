@@ -8,7 +8,7 @@ subprojects {
 
 
     repositories {
-        maven { url "http://192.168.1.210:8081/nexus/content/groups/public/" }
+        maven { url "http://nexus.eatuo.com:81/content/groups/public/" }
         mavenCentral()
     }
 
@@ -24,7 +24,10 @@ subprojects {
     dependencies {
         //slf4j配置
         compile "org.slf4j:slf4j-api:${slf4jVersion}"
-        compile "ch.qos.logback:logback-classic:${logbackVersion}"
+        compile("ch.qos.logback:logback-classic:${logbackVersion}"){
+            exclude(group:"org.slf4j")
+        }
+        compile "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
 
         //google java工具类
         compile "com.google.guava:guava:${guavaVersion}"
@@ -36,8 +39,14 @@ subprojects {
         compile "commons-lang:commons-lang:2.6"
         compile "commons-io:commons-io:2.4"
         compile "commons-collections:commons-collections:3.2.2"
-        compile "commons-beanutils:commons-beanutils:1.9.2"
-        compile "commons-digester:commons-digester:1.8"
+        compile("commons-beanutils:commons-beanutils:1.9.2"){
+            exclude(group:" commons-logging")
+            exclude(group:" commons-collections")
+        }
+        compile("commons-digester:commons-digester:1.8"){
+            exclude(group:" commons-logging")
+            exclude(group:" commons-beanutils")
+        }
         compile "commons-codec:commons-codec:1.10"
 
         //junit

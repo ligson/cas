@@ -6,14 +6,19 @@ import org.ca.ras.user.service.UserService;
 import org.ligson.fw.core.service.impl.BaseServiceImpl;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
 /**
  * Created by ligson on 2016/4/26.
  */
 @Repository(value = "userService")
-public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements UserService{
+public class UserServiceImpl extends BaseServiceImpl<UserEntity> implements UserService {
+
+    @Resource
     private UserDao userDao;
 
-    @Override
+    @PostConstruct
     public void initBaseDao() {
         baseDao = userDao;
     }

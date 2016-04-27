@@ -17,6 +17,10 @@ dependencies {
     compile "org.freemarker:freemarker:${freemarkerVersion}"
 
     //dubbo
-    compile "com.alibaba:dubbo:${dubboVersion}"
-    compile "com.101tec:zkclient:${zkclientVersion}"
+    compile("com.alibaba:dubbo:${dubboVersion}") {
+        exclude(group: "org.springframework", module: "spring")
+    }
+    compile("com.101tec:zkclient:${zkclientVersion}") {
+        exclude(group: "log4j")
+    }
 }

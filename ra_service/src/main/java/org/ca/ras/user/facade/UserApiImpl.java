@@ -20,11 +20,11 @@ import javax.annotation.Resource;
  */
 public class UserApiImpl implements UserApi {
 
-    @Autowired
+    @Resource
     private LoginBiz loginBiz;
-    @Autowired
+    @Resource
     private RegisterBiz registerBiz;
-    @Autowired
+    @Resource
     private QueryBiz queryBiz;
 
     @Override

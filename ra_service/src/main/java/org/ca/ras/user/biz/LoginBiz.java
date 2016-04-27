@@ -20,7 +20,7 @@ import javax.annotation.Resource;
  * Created by ligson on 2016/4/26.
  */
 @Api(name = "用户登录接口")
-@Component("loginBiz")
+@Component(value = "loginBiz")
 public class LoginBiz extends AbstractBiz<LoginRequestDto, LoginResponseDto> {
 
     @Resource
@@ -75,7 +75,7 @@ public class LoginBiz extends AbstractBiz<LoginRequestDto, LoginResponseDto> {
             setFailureResult(FailureCodeEnum.E_BIZ_20004);
             return false;
         }
-        if(UserState.DISABLED.equals(entity.getStatus())){
+        if (UserState.DISABLED.equals(entity.getStatus())) {
 
         }
         return null;

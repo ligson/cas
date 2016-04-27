@@ -7,6 +7,8 @@ import org.ca.ras.cert.dto.QueryCertRequestDto;
 import org.ca.ras.cert.dto.QueryCertResponseDto;
 import org.ligson.fw.core.facade.base.result.Result;
 
+import javax.annotation.Resource;
+
 /**
  * Created by ligson on 2016/4/25.
  */

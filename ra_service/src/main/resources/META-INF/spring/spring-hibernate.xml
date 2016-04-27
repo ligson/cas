@@ -44,6 +44,7 @@
                 <prop key="hibernate.show_sql">${db.showSql}</prop>
                 <prop key="hibernate.hbm2ddl.auto">update</prop>
                 <prop key="current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+                <!--<prop key="current_session_context_class">thread</prop>-->
                 <!--二级缓存配置-->
                 <!--<prop key="hibernate.use_second_level_cache">true</prop>
                 <prop key="hibernate.use_query_cache">true</prop>
@@ -77,12 +78,9 @@
         </tx:attributes>
     </tx:advice>
     <aop:config>
-        <aop:pointcut expression="execution(public * org.ligson.coderstar2..dao.impl..*.*(..))"
+        <aop:pointcut expression="execution(public * org.ca.ras..service.impl..*.*(..))"
                       id="bussinessService1"/>
-        <aop:pointcut expression="execution(public * org.ligson.hfw..dao.impl..*.*(..))"
-                      id="bussinessService2"/>
         <aop:advisor advice-ref="baseServiceAdvice" pointcut-ref="bussinessService1"/>
-        <aop:advisor advice-ref="baseServiceAdvice" pointcut-ref="bussinessService2"/>
     </aop:config>
 
 </beans>

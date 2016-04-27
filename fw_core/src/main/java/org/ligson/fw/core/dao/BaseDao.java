@@ -4,6 +4,8 @@ package org.ligson.fw.core.dao;
 import org.ligson.fw.core.common.crud.ICommonQuery;
 import org.ligson.fw.core.entity.BasicEntity;
 
+import java.math.BigInteger;
+
 /***
  * hibernate dao封装
  *
@@ -17,7 +19,7 @@ public interface BaseDao<T extends BasicEntity> extends ICommonQuery<T> {
      * @param t 实体
      * @return id
      */
-    long add(T t);
+    BigInteger add(T t);
 
     /***
      * save or update 操作
