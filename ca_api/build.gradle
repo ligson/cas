@@ -1,15 +1,3 @@
-group 'org.ca.cas'
-version '1.0-SNAPSHOT'
-
-ext {
-    mysqlVersion = "5.1.29"
-    freemarkerVersion = "2.3.23"
-}
 dependencies {
-    //compile project(":common")
-    //compile project(":fw_facade")
-    //mysql driver
-    compile "mysql:mysql-connector-java:${mysqlVersion}"
-    //freemarker
-    compile "org.freemarker:freemarker:${freemarkerVersion}"
+    compile "org.ligson.fw:fw_facade:1.0-SNAPSHOT"
 }

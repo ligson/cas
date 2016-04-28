@@ -1,13 +1,8 @@
-group 'org.ca.cas'
-version '1.0-SNAPSHOT'
-
 ext {
-    mysqlVersion = "5.1.29"
     freemarkerVersion = "2.3.23"
 }
 dependencies {
-    //mysql driver
-    compile "mysql:mysql-connector-java:${mysqlVersion}"
+    compile project(":ca_api")
     //freemarker
     compile "org.freemarker:freemarker:${freemarkerVersion}"
 }
