@@ -7,7 +7,7 @@ ext {
 }
 dependencies {
     compile project(":ca_api")
-    compile project(":fw_core")
+    //compile project(":fw_core")
     //mysql driver
     compile "mysql:mysql-connector-java:${mysqlVersion}"
     //freemarker
