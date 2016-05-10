@@ -61,6 +61,13 @@ public class QueryUserRequestDto extends BaseQueryPageRequestDto {
      */
     private String photo;
 
+    /***
+     * 角色
+     *
+     * @see org.ca.common.user.enums.UserRole
+     */
+    private Integer role;
+
     public BigInteger getId() {
         return id;
     }
@@ -141,6 +148,14 @@ public class QueryUserRequestDto extends BaseQueryPageRequestDto {
         this.photo = photo;
     }
 
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "QueryUserRequestDto{" +
@@ -154,6 +169,7 @@ public class QueryUserRequestDto extends BaseQueryPageRequestDto {
                 ", email='" + email + '\'' +
                 ", registerDate=" + registerDate +
                 ", photo='" + photo + '\'' +
+                ", role=" + role +
                 '}';
     }
 }

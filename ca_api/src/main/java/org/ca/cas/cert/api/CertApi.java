@@ -1,9 +1,6 @@
 package org.ca.cas.cert.api;
 
-import org.ca.cas.cert.dto.IssueCertRequestDto;
-import org.ca.cas.cert.dto.IssueCertResponseDto;
-import org.ca.cas.cert.dto.QueryCertRequestDto;
-import org.ca.cas.cert.dto.QueryCertResponseDto;
+import org.ca.cas.cert.dto.*;
 import org.ligson.fw.core.facade.base.result.Result;
 
 /**
@@ -27,6 +24,8 @@ public interface CertApi {
      * @return
      */
     Result<QueryCertResponseDto> queryCert(QueryCertRequestDto requestDto);
+
+    Result<EnrollCertResponseDto> enrollCert(EnrollCertRequestDto requestDto);
 
 
 }

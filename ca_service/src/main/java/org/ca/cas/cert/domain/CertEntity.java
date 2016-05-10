@@ -1,8 +1,10 @@
 package org.ca.cas.cert.domain;
 
 import org.ca.common.cert.enums.CertType;
+import org.hibernate.annotations.GenericGenerator;
 import org.ligson.fw.core.entity.BasicEntity;
 
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
 
@@ -10,6 +12,8 @@ import java.util.Date;
  * Created by ligson on 2016/4/18.
  * CA证书
  */
+@Entity
+@Table(name = "cert")
 public class CertEntity extends BasicEntity {
     /***
      * 证书id
@@ -129,6 +133,10 @@ public class CertEntity extends BasicEntity {
      */
     private BigInteger userId;
 
+    @Id
+    @GeneratedValue(generator = "dr.id")
+    @GenericGenerator(name = "dr.id", strategy = "org.ligson.fw.core.common.idgenerator.DateRandomGenerator")
+    @Column(length = 32, precision = 32, scale = 0)
     public BigInteger getId() {
         return id;
     }
@@ -137,6 +145,7 @@ public class CertEntity extends BasicEntity {
         this.id = id;
     }
 
+    @Column(name = "status")
     public Integer getStatus() {
         return status;
     }
@@ -145,6 +154,7 @@ public class CertEntity extends BasicEntity {
         this.status = status;
     }
 
+    @Column(name = "req_date")
     public Date getReqDate() {
         return reqDate;
     }
@@ -153,6 +163,7 @@ public class CertEntity extends BasicEntity {
         this.reqDate = reqDate;
     }
 
+    @Column(name = "req_buf")
     public String getReqBuf() {
         return reqBuf;
     }
@@ -161,6 +172,7 @@ public class CertEntity extends BasicEntity {
         this.reqBuf = reqBuf;
     }
 
+    @Column(name = "req_buf_type")
     public Integer getReqBufType() {
         return reqBufType;
     }
@@ -169,6 +181,7 @@ public class CertEntity extends BasicEntity {
         this.reqBufType = reqBufType;
     }
 
+    @Column(name = "req_comment")
     public String getReqComment() {
         return reqComment;
     }
@@ -177,6 +190,7 @@ public class CertEntity extends BasicEntity {
         this.reqComment = reqComment;
     }
 
+    @Column(name = "approve_date")
     public Date getApproveDate() {
         return approveDate;
     }
@@ -185,6 +199,7 @@ public class CertEntity extends BasicEntity {
         this.approveDate = approveDate;
     }
 
+    @Column(name = "reject_after")
     public Date getRejectDate() {
         return rejectDate;
     }
@@ -193,6 +208,7 @@ public class CertEntity extends BasicEntity {
         this.rejectDate = rejectDate;
     }
 
+    @Column(name = "sign_date")
     public Date getSignDate() {
         return signDate;
     }
@@ -201,6 +217,7 @@ public class CertEntity extends BasicEntity {
         this.signDate = signDate;
     }
 
+    @Column(name = "sign_buf")
     public String getSignBuf() {
         return signBuf;
     }
@@ -209,6 +226,7 @@ public class CertEntity extends BasicEntity {
         this.signBuf = signBuf;
     }
 
+    @Column(name = "sign_buf_p7")
     public String getSignBufP7() {
         return signBufP7;
     }
@@ -217,6 +235,7 @@ public class CertEntity extends BasicEntity {
         this.signBufP7 = signBufP7;
     }
 
+    @Column(name = "serial_number")
     public String getSerialNumber() {
         return serialNumber;
     }
@@ -225,6 +244,7 @@ public class CertEntity extends BasicEntity {
         this.serialNumber = serialNumber;
     }
 
+    @Column(name = "not_before")
     public Date getNotBefore() {
         return notBefore;
     }
@@ -233,6 +253,7 @@ public class CertEntity extends BasicEntity {
         this.notBefore = notBefore;
     }
 
+    @Column(name = "not_after")
     public Date getNotAfter() {
         return notAfter;
     }
@@ -241,6 +262,7 @@ public class CertEntity extends BasicEntity {
         this.notAfter = notAfter;
     }
 
+    @Column(name = "issuer_dn")
     public String getIssuerDn() {
         return issuerDn;
     }
@@ -249,6 +271,7 @@ public class CertEntity extends BasicEntity {
         this.issuerDn = issuerDn;
     }
 
+    @Column(name = "issuer_dn_hash_md5")
     public String getIssuerDnHashMd5() {
         return issuerDnHashMd5;
     }
@@ -257,6 +280,7 @@ public class CertEntity extends BasicEntity {
         this.issuerDnHashMd5 = issuerDnHashMd5;
     }
 
+    @Column(name = "subject_dn")
     public String getSubjectDn() {
         return subjectDn;
     }
@@ -265,6 +289,7 @@ public class CertEntity extends BasicEntity {
         this.subjectDn = subjectDn;
     }
 
+    @Column(name = "subject_dn_hash_md5")
     public String getSubjectDnHashMd5() {
         return subjectDnHashMd5;
     }
@@ -273,6 +298,7 @@ public class CertEntity extends BasicEntity {
         this.subjectDnHashMd5 = subjectDnHashMd5;
     }
 
+    @Column(name = "suspend_date")
     public String getSuspendDate() {
         return suspendDate;
     }
@@ -281,6 +307,7 @@ public class CertEntity extends BasicEntity {
         this.suspendDate = suspendDate;
     }
 
+    @Column(name = "revoke_date")
     public String getRevokeDate() {
         return revokeDate;
     }
@@ -289,6 +316,7 @@ public class CertEntity extends BasicEntity {
         this.revokeDate = revokeDate;
     }
 
+    @Column(name = "revoke_reason")
     public String getRevokeReason() {
         return revokeReason;
     }
@@ -297,6 +325,7 @@ public class CertEntity extends BasicEntity {
         this.revokeReason = revokeReason;
     }
 
+    @Column(name = "renewal_date")
     public Date getRenewalDate() {
         return renewalDate;
     }
@@ -305,6 +334,7 @@ public class CertEntity extends BasicEntity {
         this.renewalDate = renewalDate;
     }
 
+    @Column(name = "renewal_prev_serial_number")
     public String getRenewalPrevSerialNumber() {
         return renewalPrevSerialNumber;
     }
@@ -313,6 +343,7 @@ public class CertEntity extends BasicEntity {
         this.renewalPrevSerialNumber = renewalPrevSerialNumber;
     }
 
+    @Column(name = "renewal_next_serial_number")
     public String getRenewalNextIdSerialNumber() {
         return renewalNextIdSerialNumber;
     }
@@ -321,6 +352,7 @@ public class CertEntity extends BasicEntity {
         this.renewalNextIdSerialNumber = renewalNextIdSerialNumber;
     }
 
+    @Column(name = "req_override_validity")
     public Integer getReqOverrideValidity() {
         return reqOverrideValidity;
     }
@@ -329,6 +361,7 @@ public class CertEntity extends BasicEntity {
         this.reqOverrideValidity = reqOverrideValidity;
     }
 
+    @Column(name = "cert_pin")
     public String getCertPin() {
         return certPin;
     }
@@ -337,6 +370,7 @@ public class CertEntity extends BasicEntity {
         this.certPin = certPin;
     }
 
+    @Column(name = "cert_type")
     public Integer getCertType() {
         return certType;
     }
@@ -345,6 +379,7 @@ public class CertEntity extends BasicEntity {
         this.certType = certType;
     }
 
+    @Column(length = 32, precision = 32, scale = 0, name = "user_id")
     public BigInteger getUserId() {
         return userId;
     }

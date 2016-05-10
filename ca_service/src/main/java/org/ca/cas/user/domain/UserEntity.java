@@ -1,13 +1,17 @@
 package org.ca.cas.user.domain;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.ligson.fw.core.entity.BasicEntity;
 
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
  * Created by ligson on 2016/4/25.
  */
+@Entity
+@Table(name = "ca_user")
 public class UserEntity extends BasicEntity {
     /***
      * id
@@ -61,6 +65,18 @@ public class UserEntity extends BasicEntity {
      */
     private String photo;
 
+    /***
+     * 角色
+     *
+     * @see org.ca.common.user.enums.UserRole
+     */
+    private Integer role;
+
+
+    @Id
+    @GeneratedValue(generator = "dr.id")
+    @GenericGenerator(name = "dr.id", strategy = "org.ligson.fw.core.common.idgenerator.DateRandomGenerator")
+    @Column(length = 32, precision = 32, scale = 0)
     public BigInteger getId() {
         return id;
     }
@@ -69,6 +85,7 @@ public class UserEntity extends BasicEntity {
         this.id = id;
     }
 
+    @Column(columnDefinition = "datetime comment '出生日期'")
     public Date getBirth() {
         return birth;
     }
@@ -77,6 +94,7 @@ public class UserEntity extends BasicEntity {
         this.birth = birth;
     }
 
+    @Column(columnDefinition = "varchar(32) comment '登陆名'")
     public String getName() {
         return name;
     }
@@ -85,6 +103,7 @@ public class UserEntity extends BasicEntity {
         this.name = name;
     }
 
+    @Column(columnDefinition = "varchar(255) comment '密码'")
     public String getPassword() {
         return password;
     }
@@ -93,6 +112,7 @@ public class UserEntity extends BasicEntity {
         this.password = password;
     }
 
+    @Column(columnDefinition = "tinyint comment '性别'")
     public Boolean getSex() {
         return sex;
     }
@@ -101,6 +121,7 @@ public class UserEntity extends BasicEntity {
         this.sex = sex;
     }
 
+    @Column(columnDefinition = "int comment '状态'")
     public Integer getStatus() {
         return status;
     }
@@ -109,6 +130,7 @@ public class UserEntity extends BasicEntity {
         this.status = status;
     }
 
+    @Column(columnDefinition = "varchar(32) comment '手机号'")
     public String getMobile() {
         return mobile;
     }
@@ -117,6 +139,7 @@ public class UserEntity extends BasicEntity {
         this.mobile = mobile;
     }
 
+    @Column(columnDefinition = "varchar(128) comment '邮箱'")
     public String getEmail() {
         return email;
     }
@@ -125,6 +148,7 @@ public class UserEntity extends BasicEntity {
         this.email = email;
     }
 
+    @Column(name = "register_date", columnDefinition = "datetime comment '注册日期'")
     public Date getRegisterDate() {
         return registerDate;
     }
@@ -133,11 +157,21 @@ public class UserEntity extends BasicEntity {
         this.registerDate = registerDate;
     }
 
+    @Column(columnDefinition = "varchar(255) comment '头像'")
     public String getPhoto() {
         return photo;
     }
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    @Column(columnDefinition = "int comment '角色'")
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
     }
 }

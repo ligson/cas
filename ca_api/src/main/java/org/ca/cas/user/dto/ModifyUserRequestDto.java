@@ -55,6 +55,13 @@ public class ModifyUserRequestDto extends BaseRequestDto {
      */
     private String photo;
 
+    /***
+     * 角色
+     *
+     * @see org.ca.common.user.enums.UserRole
+     */
+    private Integer role;
+
     public BigInteger getId() {
         return id;
     }
@@ -119,6 +126,14 @@ public class ModifyUserRequestDto extends BaseRequestDto {
         this.photo = photo;
     }
 
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "ModifyUserRequestDto{" +
@@ -130,6 +145,7 @@ public class ModifyUserRequestDto extends BaseRequestDto {
                 ", mobile='" + mobile + '\'' +
                 ", email='" + email + '\'' +
                 ", photo='" + photo + '\'' +
+                ", role=" + role +
                 '}';
     }
 }

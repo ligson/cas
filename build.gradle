@@ -1,4 +1,6 @@
 subprojects {
+    group 'org.ca.cas'
+    version '1.0-SNAPSHOT'
 //插件
     apply plugin: 'java'
     apply plugin: "idea"
