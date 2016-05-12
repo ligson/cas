@@ -10,7 +10,7 @@
                 </td>
                 <td style="height:52px;">
                     <div style="color:#fff;font-size:22px;font-weight:bold;">
-                        <a style="color:#fff;font-size:22px;font-weight:bold;text-decoration:none">RA管理系统</a>
+                        <a style="color:#fff;font-size:22px;font-weight:bold;text-decoration:none">CA管理系统</a>
                     </div>
                     <div style="color:#fff">
                         <a style="color:#fff;text-decoration:none">让一切XX使用的更方便!</a>
@@ -20,7 +20,7 @@
                     <div id="topmenu">
                         <a href="${basePath}admin/certMgr/index.html">证书管理</a>
                         <a href="/questionMgr/index">问题管理</a>
-                        <a href="/userMgr/index">用户管理</a>
+                        <a href="${basePath}admin/userMgr/userList.html">用户管理</a>
                         <a href="/payMgr/index">支付管理</a>
                         <a href="/systemMgr/index">系统管理</a>
                     </div>

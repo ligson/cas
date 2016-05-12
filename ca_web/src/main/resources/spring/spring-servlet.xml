@@ -29,7 +29,8 @@
 
     <context:property-placeholder location="classpath:*.properties" ignore-unresolvable="true"/>
 
-    <import resource="consumer.xml"/>
+    <import resource="ca-consumer.xml"/>
+    <import resource="kms-consumer.xml"/>
 
     <import resource="spring-freemarker.xml"/>
 
@@ -57,12 +58,21 @@
         <property name="maxInMemorySize" value="40960"/>
     </bean>
 
+    <!--日期格式转换-->
+    <bean id="dateEditor" class="org.springframework.beans.factory.config.CustomEditorConfigurer"> <!--注册我们的类-->
+        <property name="customEditors">
+            <map>
+                <entry key="java.util.Date" value="org.ligson.fw.web.convert.DateEditor"/>
+            </map>
+        </property>
+    </bean>
+
+
     <!--拦截器-->
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <!--<mvc:mapping path="/*.html"/>-->
-            <bean class="org.ca.ras.web.pub.interceptor.WebInterceptor"/>
+            <bean class="org.ca.cas.web.interceptor.WebInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 
@@ -71,7 +81,7 @@
     <mvc:annotation-driven/>
 
     <!-- 设置使用注解的类所在的jar包 -->
-    <context:component-scan base-package="org.ca.ras.web"/>
+    <context:component-scan base-package="org.ca.cas.web"/>
 
 
 </beans>

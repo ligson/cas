@@ -18,8 +18,10 @@ import org.ca.kms.key.vo.Key;
 import org.ligson.fw.core.facade.base.result.Result;
 import org.ligson.fw.string.encode.HashHelper;
 import org.ligson.fw.web.controller.BaseController;
+import org.ligson.fw.web.vo.WebResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -44,13 +46,13 @@ public class PubController extends BaseController {
     @RequestMapping("/")
     public String index() {
         QueryUserRequestDto requestDto = new QueryUserRequestDto();
-        requestDto.setRole(UserRole.CA_ADMIN.getCode());
+        requestDto.setRole(UserRole.SUPER.getCode());
         Result<QueryUserResponseDto> result = userApi.query(requestDto);
         if (result.isSuccess()) {
             if (result.getData().getUserList().size() == 0) {
                 return redirect("/init.html");
             } else {
-                return "manager/login.html";
+                return redirect("/admin/login.html");
             }
         } else {
             return "500";
@@ -64,11 +66,12 @@ public class PubController extends BaseController {
 
     @RequestMapping("/init.do")
     public String init(RegisterRequestDto requestDto) {
+        requestDto.setPassword(HashHelper.md5(requestDto.getPassword()));
         Result<RegisterResponseDto> result = userApi.register(requestDto);
         if (result.isSuccess()) {
             BigInteger userId = result.getData().getId();
             ModifyUserRequestDto modifyUserRequestDto = new ModifyUserRequestDto();
-            modifyUserRequestDto.setRole(UserRole.CA_ADMIN.getCode());
+            modifyUserRequestDto.setRole(UserRole.SUPER.getCode());
             modifyUserRequestDto.setId(userId);
             Result<ModifyUserResponseDto> modifyResult = userApi.modify(modifyUserRequestDto);
             if (modifyResult.isSuccess()) {
@@ -98,7 +101,7 @@ public class PubController extends BaseController {
         requestDto.setKeyId(new BigInteger(keyId));
         BigInteger userId = (BigInteger) session.getAttribute("initUserId");
         requestDto.setUserId(userId);
-        String subjectDn = "o=" + o + ";ou=" + ou + ";cn=" + cn;
+        String subjectDn = "o=" + o + ",ou=" + ou + ",cn=" + cn;
         requestDto.setSubjectDn(subjectDn);
         requestDto.setIssueDn(subjectDn);
         requestDto.setSubjectDnHashMd5(HashHelper.md5(subjectDn));
@@ -110,13 +113,14 @@ public class PubController extends BaseController {
                 return redirect("/download.html?certId=" + enrollCertResult.getData().getCertId());
             }
         }
+        model.addAttribute("errorMsg", enrollCertResult.getFailureMessage());
         return redirect("/initCert.html");
     }
 
     @RequestMapping("/download.html")
     public String toDownload(String certId) {
         request.setAttribute("certId", certId);
-        return "admin/certMgr/download";
+        return "pub/download";
     }
 
     @RequestMapping("/download.do")
@@ -130,12 +134,29 @@ public class PubController extends BaseController {
                 Cert cert = queryResult.getData().getCert();
                 byte[] certBuf = Base64.decodeBase64(cert.getSignBuf());
                 response.setContentType("application/x-x509-ca-cert");
-                response.getOutputStream().write(certBuf);
+                response.setHeader("Content-Disposition", "attachment;fileName=" + cert.getSerialNumber() + ".crt");
+                response.getWriter().print(cert.getSignBuf());
+                return;
                 //application/x-x509-ca-cert
             }
         }
         response.setContentType("text/html");
         response.getOutputStream().println("证书下载失败:" + queryResult.getFailureMessage());
+    }
+
+    @ResponseBody
+    @RequestMapping("/checkLoginName.json")
+    public WebResult checkLoginName(QueryUserRequestDto requestDto) {
+        Result<QueryUserResponseDto> result = userApi.query(requestDto);
+        if (result.isSuccess()) {
+            boolean valid = result.getData().getUserList().size() == 0;
+            webResult.setSuccess(true);
+            webResult.put("valid", valid);
+        } else {
+            webResult.setSuccess(false);
+            webResult.put("valid", false);
+        }
+        return webResult;
     }
 
 }

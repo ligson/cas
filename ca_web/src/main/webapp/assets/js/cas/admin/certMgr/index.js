@@ -6,7 +6,7 @@ $(function () {
             {field: 'ck', title: 'ckID', width: 40, checkbox: 'true'},
             {field: 'id', title: 'ID', width: 40},
             {
-                field: '状态', title: '类型', width: 50, formatter: function (value, row, index) {
+                field: 'status', title: '状态', width: 50, formatter: function (value, row, index) {
                 //ENROLL(0, "申请"), VALID(1, "有效"), REVOKE(2, "吊销"), SUSPEND(3, "挂起");
                 if (value == 0) {
                     return "待审批";

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * Created by ligson on 2016/4/26.
@@ -84,6 +85,7 @@ public class RegisterBiz extends AbstractBiz<RegisterRequestDto, RegisterRespons
         UserEntity entity = new UserEntity();
         BeanUtils.copyProperties(requestDto, entity);
         entity.setStatus(UserState.VALID.getCode());
+        entity.setRegisterDate(new Date());
         context.setAttr("entity", entity);
         return true;
     }

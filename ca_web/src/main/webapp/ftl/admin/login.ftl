@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>RA管理系统登陆</title>
+    <title>CA管理系统登陆</title>
     <link rel="stylesheet" type="text/css" href="${assetsPath}js/lib/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="${assetsPath}js/lib/bootstrap-3.3.5-dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="${assetsPath}css/admin/admin-login.css">
@@ -14,7 +14,7 @@
 <body>
 <div class="login-container">
     <h2 style="padding-bottom:5px;font-size:14px;font-weight:bold;padding-left:10px;border-bottom:1px solid gainsboro;">
-        RA登陆</h2>
+        CA登陆</h2>
 
     <form action="${basePath}admin/login.do" method="post">
         <div>

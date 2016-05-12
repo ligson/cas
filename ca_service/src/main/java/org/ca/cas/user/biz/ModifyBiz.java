@@ -5,6 +5,7 @@ import org.ca.cas.user.dto.ModifyUserRequestDto;
 import org.ca.cas.user.dto.ModifyUserResponseDto;
 import org.ca.cas.user.service.UserService;
 import org.ligson.fw.core.common.biz.AbstractBiz;
+import org.ligson.fw.core.common.utils.BeanCopy;
 import org.ligson.fw.core.entity.Pagination;
 import org.ligson.fw.core.facade.annotation.Api;
 import org.ligson.fw.core.facade.enums.FailureCodeEnum;
@@ -80,7 +81,7 @@ public class ModifyBiz extends AbstractBiz<ModifyUserRequestDto, ModifyUserRespo
     @Override
     public Boolean txnPreProcessing() {
         UserEntity entity = (UserEntity) context.getAttr("entity");
-        BeanUtils.copyProperties(requestDto, entity);
+        BeanCopy.copyPropertiesIgnoreNull(requestDto, entity);
         return true;
     }
 

@@ -1,12 +1,13 @@
 package org.ca.cas.user.vo;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
  * Created by ligson on 2016/4/25.
  */
-public class User {
+public class User implements Serializable {
     /***
      * id
      */
@@ -53,6 +54,11 @@ public class User {
      * 用户头像绝对http://
      */
     private String photo;
+
+    /***
+     * @see org.ca.common.user.enums.UserRole
+     */
+    private Integer role;
 
     public BigInteger getId() {
         return id;
@@ -124,5 +130,29 @@ public class User {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", birth=" + birth +
+                ", name='" + name + '\'' +
+                ", sex=" + sex +
+                ", status=" + status +
+                ", mobile='" + mobile + '\'' +
+                ", email='" + email + '\'' +
+                ", registerDate=" + registerDate +
+                ", photo='" + photo + '\'' +
+                ", role=" + role +
+                '}';
     }
 }

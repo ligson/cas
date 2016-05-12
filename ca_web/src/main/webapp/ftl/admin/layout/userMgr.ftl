@@ -12,9 +12,9 @@
 <#include "admin/layout/adminCommonBody.ftl">
 <div id="westPanel" data-options="region:'west',split:false" title="导航菜单" style="width:150px;" about="systemMgr">
     <div class="easyui-accordion" style="width:148px;height:100%;">
-        <div title="证书管理" data-options="iconCls:'icon-ok'" style="overflow:auto;padding:10px;">
+        <div title="用户管理" data-options="iconCls:'icon-ok'" style="overflow:auto;padding:10px;">
             <ul class="easyui-tree">
-                <li><a href="${basePath}admin/certMgr/index.html">证书列表</a></li>
+                <li><a href="${basePath}admin/userMgr/userList.html">用户列表</a></li>
                 <li><a href="${basePath}admin/certMgr/waitApproveCertList.html">待批准证书列表</a></li>
             </ul>
         </div>

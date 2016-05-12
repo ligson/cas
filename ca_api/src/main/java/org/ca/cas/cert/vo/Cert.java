@@ -2,13 +2,14 @@ package org.ca.cas.cert.vo;
 
 import org.ca.common.cert.enums.CertType;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
 /**
  * Created by ligson on 2016/4/25.
  */
-public class Cert {
+public class Cert implements Serializable {
     /***
      * 证书id
      */

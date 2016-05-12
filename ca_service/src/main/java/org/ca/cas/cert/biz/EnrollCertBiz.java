@@ -14,12 +14,17 @@ import org.ca.cas.cert.dto.EnrollCertRequestDto;
 import org.ca.cas.cert.dto.EnrollCertResponseDto;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.CertService;
+import org.ca.common.utils.KeyPairUtils;
+import org.ca.common.utils.X500NameUtils;
 import org.ca.kms.key.api.KeyApi;
-import org.ca.kms.key.dto.QueryKeyPairRequestDto;
-import org.ca.kms.key.dto.QueryKeyPairResponseDto;
+import org.ca.kms.key.dto.*;
+import org.ca.kms.key.enums.KeyFailEnum;
+import org.ca.kms.key.enums.KeyStatus;
+import org.ca.kms.key.vo.Key;
 import org.ligson.fw.core.common.biz.AbstractBiz;
 import org.ligson.fw.core.facade.annotation.Api;
 import org.ligson.fw.core.facade.base.result.Result;
+import org.ligson.fw.core.facade.enums.FailureCodeEnum;
 import org.ligson.fw.string.encode.HashHelper;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +33,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -114,13 +121,19 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         entity.setIssuerDnHashMd5(requestDto.getIssueDnHashMd5());
         certService.add(entity);
 
-        QueryKeyPairRequestDto queryKeyPairRequestDto = new QueryKeyPairRequestDto();
-        queryKeyPairRequestDto.setKeyId(requestDto.getKeyId());
-        Result<QueryKeyPairResponseDto> queryKeyPairResult = keyApi.queryKeyPair(queryKeyPairRequestDto);
-        if (queryKeyPairResult.isSuccess()) {
-            QueryKeyPairResponseDto queryKeyPairResponseDto = queryKeyPairResult.getData();
-            X500Name issueDn = new X500Name(requestDto.getIssueDn());
-            X500Name subjectDn = new X500Name(requestDto.getSubjectDn());
+        KeyQueryRequestDto keyQueryRequestDto = new KeyQueryRequestDto();
+        keyQueryRequestDto.setId(requestDto.getKeyId());
+        keyQueryRequestDto.setPageAble(false);
+        Result<KeyQueryResponseDto> keyQueryResult = keyApi.queryKey(keyQueryRequestDto);
+        if (keyQueryResult.isSuccess()) {
+            KeyQueryResponseDto keyQueryResponseDto = keyQueryResult.getData();
+            Key key = keyQueryResponseDto.getKey();
+            PrivateKey privateKey = KeyPairUtils.decodePrivateKey(key.getPrivateKey());
+            PublicKey publicKey = KeyPairUtils.decodePublicKey(key.getPublicKey());
+
+
+            X500Name issueDn = X500NameUtils.subjectToX500Name(requestDto.getIssueDn());
+            X500Name subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
 
             Date startDate = requestDto.getStartDate();
             Calendar calendar = Calendar.getInstance();
@@ -128,11 +141,12 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             calendar.add(Calendar.YEAR, 1);
             Date endDate = calendar.getTime();
 
-            X509Certificate certificate = makeCertBiz.gen(queryKeyPairResponseDto.getPublicKey(), queryKeyPairResponseDto.getPrivateKey(), issueDn, subjectDn, entity.getId(), startDate, endDate, null);
+            X509Certificate certificate = makeCertBiz.gen(publicKey, privateKey, issueDn, subjectDn, entity.getId(), startDate, endDate, null);
             byte[] certBuf = null;
             byte[] certChainBuf = null;
             try {
                 certBuf = certificate.getEncoded();
+                entity.setSignBuf(Base64.encodeBase64String(certBuf));
                 certChainBuf = getCertChain(entity, certBuf);
             } catch (CertificateEncodingException e) {
                 e.printStackTrace();
@@ -144,7 +158,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 entity.setReqOverrideValidity(365);
                 entity.setSerialNumber(entity.getId().toString());
                 entity.setCertPin(requestDto.getCertPin());
-                entity.setSignBuf(Base64.encodeBase64String(certBuf));
+
                 entity.setSignBufP7(Base64.encodeBase64String(certChainBuf));
 
             } else {
@@ -209,8 +223,18 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         certService.update(entity);
         responseDto.setSuccess(true);
         responseDto.setCertId(entity.getId());
-        setSuccessResult();
-        return true;
+        ModifyKeyRequestDto modifyKeyRequestDto = new ModifyKeyRequestDto();
+        modifyKeyRequestDto.setId(requestDto.getKeyId());
+        modifyKeyRequestDto.setKeyStatus(KeyStatus.INUSE.getCode());
+        modifyKeyRequestDto.setUseTime(new Date());
+        Result<ModifyKeyResponseDto> modifyKeyResult = keyApi.modifyKey(modifyKeyRequestDto);
+        if (modifyKeyResult.isSuccess()) {
+            setSuccessResult();
+            return true;
+        } else {
+            setFailureResult(FailureCodeEnum.getByCode(modifyKeyResult.getFailureCode()));
+            return false;
+        }
     }
 
     @Override

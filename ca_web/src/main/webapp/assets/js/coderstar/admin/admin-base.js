@@ -36,6 +36,13 @@ $(function () {
                 return /^\d{2}:\d{2}:\d{2}$/.test(value);
             },
             message: '请输入HH:mm:ss格式'
+        },
+        mobile: {
+            validator: function (value, param) {
+                var reg = /^0?1[3|4|5|8][0-9]\d{8}$/;
+                return reg.test(value);
+            },
+            message: "请输入正确的手机号"
         }
     });
 

@@ -17,7 +17,7 @@ $(function () {
                         message: '该项不能为空!'
                     },
                     remote:{
-                        url:"/ra/user/checkLoginName.json",
+                        url:"/ca/checkLoginName.json",
                         message:"用户名已存在"
                     }
                 }
@@ -31,7 +31,7 @@ $(function () {
                         message: "请输入正确的手机号!"
                     },
                     remote:{
-                        url:"/ra/user/checkLoginName.json",
+                        url:"/ca/checkLoginName.json",
                         message:"手机号已存在"
                     }
                 }
@@ -46,7 +46,7 @@ $(function () {
                     }
                 },
                 remote:{
-                    url:"/ra/user/checkLoginName.json",
+                    url:"/ca/checkLoginName.json",
                     message:"邮箱已存在"
                 }
             },

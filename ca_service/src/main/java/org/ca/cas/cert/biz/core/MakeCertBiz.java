@@ -12,6 +12,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.ca.cas.cert.biz.core.model.Extension;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -29,6 +30,7 @@ import java.util.List;
 @Component("makeCertBiz")
 public class MakeCertBiz {
 
+    @Resource
     private SignBiz signBiz;
 
     private X509Certificate gen(String version, SubjectPublicKeyInfo
