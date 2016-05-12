@@ -15,4 +15,8 @@ public interface UserApi {
     Result<LoginResponseDto> login(LoginRequestDto requestDto);
 
     Result<ModifyUserResponseDto> modify(ModifyUserRequestDto requestDto);
+
+    Result<ModifyPwdResponseDto> modifyPwd(ModifyPwdRequestDto requestDto);
+
+    Result<ResetPwdResponseDto> resetPwd(ResetPwdRequestDto requestDto);
 }

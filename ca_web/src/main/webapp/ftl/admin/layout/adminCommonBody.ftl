@@ -29,7 +29,8 @@
                 <td style="padding-right:5px;text-align:right;vertical-align:bottom;">
                     <div id="user_toolbar">
                         <p>欢迎你,<a style="color:#FFF" iconCls="icon-user" class="easyui-linkbutton" plain="true"
-                                  id="login_username">${adminUser.name}</a>&nbsp;&nbsp;
+                                  id="login_username"
+                                  href="${basePath}admin/userMgr/view.html?userId=${adminUser.id}">${adminUser.name}</a>&nbsp;&nbsp;
                             <a style="color:#FFF" class="easyui-linkbutton" iconCls="icon-control_power_blue"
                                plain="true" href="${basePath}admin/logout.do">退出</a></p>
                     </div>

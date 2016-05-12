@@ -74,6 +74,11 @@ $(function () {
                     return new Date(value).format("yyyy-MM-dd HH:mm:ss");
                 }
             }
+            },
+            {
+                field: "userId", title: "查看用户", formatter: function (value, row, idx) {
+                return "<a href='/ca/admin/userMgr/view.html?userId=" + row.userId + "'>查1看</a>";
+            }
             }
         ]],
         nowrap: false

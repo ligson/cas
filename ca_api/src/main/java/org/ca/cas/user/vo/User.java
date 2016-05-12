@@ -11,7 +11,7 @@ public class User implements Serializable {
     /***
      * id
      */
-    private BigInteger id;
+    private String id;
 
     /***
      * 生日
@@ -60,11 +60,11 @@ public class User implements Serializable {
      */
     private Integer role;
 
-    public BigInteger getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -13,7 +13,7 @@ public class Cert implements Serializable {
     /***
      * 证书id
      */
-    private BigInteger id;
+    private String id;
     /***
      * 证书状态
      *
@@ -122,18 +122,18 @@ public class Cert implements Serializable {
     /***
      * 用户id
      */
-    private BigInteger userId;
+    private String userId;
 
     /***
      * 证书类型
      */
     private Integer certType = CertType.SIGN.getCode();
 
-    public BigInteger getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -345,11 +345,11 @@ public class Cert implements Serializable {
         this.certType = certType;
     }
 
-    public BigInteger getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

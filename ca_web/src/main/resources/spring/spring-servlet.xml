@@ -71,7 +71,10 @@
     <!--拦截器-->
     <mvc:interceptors>
         <mvc:interceptor>
-            <mvc:mapping path="/**"/>
+            <mvc:mapping path="/admin"/>
+            <mvc:exclude-mapping path="/admin/login.html"/>
+            <mvc:exclude-mapping path="/admin/login.do"/>
+            <mvc:exclude-mapping path="/admin/*.json"/>
             <bean class="org.ca.cas.web.interceptor.WebInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

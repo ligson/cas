@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -141,7 +142,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             calendar.add(Calendar.YEAR, 1);
             Date endDate = calendar.getTime();
 
-            X509Certificate certificate = makeCertBiz.gen(publicKey, privateKey, issueDn, subjectDn, entity.getId(), startDate, endDate, null);
+            X509Certificate certificate = makeCertBiz.gen(publicKey, privateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, null);
             byte[] certBuf = null;
             byte[] certChainBuf = null;
             try {
@@ -156,7 +157,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 entity.setNotAfter(endDate);
                 entity.setNotBefore(startDate);
                 entity.setReqOverrideValidity(365);
-                entity.setSerialNumber(entity.getId().toString());
+                entity.setSerialNumber(entity.getId());
                 entity.setCertPin(requestDto.getCertPin());
 
                 entity.setSignBufP7(Base64.encodeBase64String(certChainBuf));

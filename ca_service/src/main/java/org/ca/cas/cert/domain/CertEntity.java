@@ -20,7 +20,7 @@ public class CertEntity extends BasicEntity {
     /***
      * 证书id
      */
-    private BigInteger id;
+    private String id;
     /***
      * 证书状态
      *
@@ -133,17 +133,17 @@ public class CertEntity extends BasicEntity {
     /***
      * 用户id
      */
-    private BigInteger userId;
+    private String userId;
 
     @Id
     @GeneratedValue(generator = "dr.id")
     @GenericGenerator(name = "dr.id", strategy = "org.ligson.fw.core.common.idgenerator.DateRandomGenerator")
-    @Column(length = 32, precision = 32, scale = 0)
-    public BigInteger getId() {
+    @Column(length = 32)
+    public String getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -385,12 +385,12 @@ public class CertEntity extends BasicEntity {
         this.certType = certType;
     }
 
-    @Column(length = 32, precision = 32, scale = 0, name = "user_id")
-    public BigInteger getUserId() {
+    @Column(length = 32, name = "user_id")
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 }

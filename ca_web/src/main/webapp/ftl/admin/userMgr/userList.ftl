@@ -12,8 +12,7 @@
 </table>
 <div id="addUserDlg" title="创建用户" class="easyui-dialog col-sm-4" closed="true" style="padding:30px;">
     <div class="container-fluid">
-        <form class="form-horizontal  easyui-form" action="${basePath}admin/userMgr/addUser.json" id="addUserForm"
-              method="post">
+        <form class="form-horizontal  easyui-form" action="${basePath}admin/userMgr/addUser.json" id="addUserForm" method="post">
             <div class="form-group row">
                 <label class="col-sm-3" for="name1">登陆名</label>
                 <div class="col-sm-6">

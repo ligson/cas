@@ -16,7 +16,7 @@ public class UserEntity extends BasicEntity {
     /***
      * id
      */
-    private BigInteger id;
+    private String id;
 
     /***
      * 生日
@@ -76,12 +76,12 @@ public class UserEntity extends BasicEntity {
     @Id
     @GeneratedValue(generator = "dr.id")
     @GenericGenerator(name = "dr.id", strategy = "org.ligson.fw.core.common.idgenerator.DateRandomGenerator")
-    @Column(length = 32, precision = 32, scale = 0)
-    public BigInteger getId() {
+    @Column(length = 32)
+    public String getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(String id) {
         this.id = id;
     }
 

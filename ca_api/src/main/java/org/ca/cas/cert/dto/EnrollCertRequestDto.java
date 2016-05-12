@@ -12,7 +12,7 @@ import java.util.Date;
  */
 public class EnrollCertRequestDto extends BaseRequestDto {
     @Param(name = "用户id", required = true)
-    private BigInteger userId;
+    private String userId;
     @Param(name = "颁发给", required = true)
     private String subjectDn;
     @Param(name = "颁发给哈希", required = true)
@@ -26,13 +26,13 @@ public class EnrollCertRequestDto extends BaseRequestDto {
     @Param(name = "开始日期", required = true)
     private Date startDate;
     @Param(name = "keyId", required = true)
-    private BigInteger keyId;
+    private String keyId;
 
-    public BigInteger getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(BigInteger userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -84,11 +84,11 @@ public class EnrollCertRequestDto extends BaseRequestDto {
         this.startDate = startDate;
     }
 
-    public BigInteger getKeyId() {
+    public String getKeyId() {
         return keyId;
     }
 
-    public void setKeyId(BigInteger keyId) {
+    public void setKeyId(String keyId) {
         this.keyId = keyId;
     }
 

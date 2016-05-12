@@ -12,7 +12,7 @@ public class ModifyCertRequestDto extends BaseRequestDto {
     /***
      * 证书id
      */
-    private BigInteger id;
+    private String id;
     /***
      * 证书状态
      *
@@ -102,11 +102,11 @@ public class ModifyCertRequestDto extends BaseRequestDto {
      */
     private String certPin;
 
-    public BigInteger getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(String id) {
         this.id = id;
     }
 

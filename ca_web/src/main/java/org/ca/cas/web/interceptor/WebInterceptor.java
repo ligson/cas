@@ -19,11 +19,18 @@ public class WebInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (handler instanceof HandlerMethod) {
+            logger.debug("请求url:{}", request.getRequestURI());
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Method method = handlerMethod.getMethod();
             String methodName = method.getName();
             Object bean = handlerMethod.getBean();
-            logger.debug("请求url:{}", request.getRequestURI());
+            String path = request.getServletPath();
+            Object token = request.getSession().getAttribute("adminUser");
+            if (token == null) {
+                response.sendRedirect("/admin/login.html");
+                return false;
+            }
+
         }
         return true;
     }

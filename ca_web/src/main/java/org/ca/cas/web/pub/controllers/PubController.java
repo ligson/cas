@@ -69,7 +69,7 @@ public class PubController extends BaseController {
         requestDto.setPassword(HashHelper.md5(requestDto.getPassword()));
         Result<RegisterResponseDto> result = userApi.register(requestDto);
         if (result.isSuccess()) {
-            BigInteger userId = result.getData().getId();
+            String userId = result.getData().getId();
             ModifyUserRequestDto modifyUserRequestDto = new ModifyUserRequestDto();
             modifyUserRequestDto.setRole(UserRole.SUPER.getCode());
             modifyUserRequestDto.setId(userId);
@@ -98,8 +98,8 @@ public class PubController extends BaseController {
     public String initCert(String keyId, String o, String ou, String cn, String certPin) {
         EnrollCertRequestDto requestDto = new EnrollCertRequestDto();
         requestDto.setCertPin(certPin);
-        requestDto.setKeyId(new BigInteger(keyId));
-        BigInteger userId = (BigInteger) session.getAttribute("initUserId");
+        requestDto.setKeyId(keyId);
+        String userId = (String) session.getAttribute("initUserId");
         requestDto.setUserId(userId);
         String subjectDn = "o=" + o + ",ou=" + ou + ",cn=" + cn;
         requestDto.setSubjectDn(subjectDn);
@@ -127,7 +127,7 @@ public class PubController extends BaseController {
     public void download(String certId) throws IOException {
         QueryCertRequestDto requestDto = new QueryCertRequestDto();
         requestDto.setPageAble(false);
-        requestDto.setId(new BigInteger(certId));
+        requestDto.setId(certId);
         Result<QueryCertResponseDto> queryResult = certApi.queryCert(requestDto);
         if (queryResult.isSuccess()) {
             if (queryResult.getData().getSuccess()) {

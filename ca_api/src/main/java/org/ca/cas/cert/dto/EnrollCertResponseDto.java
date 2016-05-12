@@ -8,13 +8,13 @@ import java.math.BigInteger;
  * Created by ligson on 2016/5/6.
  */
 public class EnrollCertResponseDto extends BaseResponseDto {
-    private BigInteger certId;
+    private String certId;
 
-    public BigInteger getCertId() {
+    public String getCertId() {
         return certId;
     }
 
-    public void setCertId(BigInteger certId) {
+    public void setCertId(String certId) {
         this.certId = certId;
     }
 
