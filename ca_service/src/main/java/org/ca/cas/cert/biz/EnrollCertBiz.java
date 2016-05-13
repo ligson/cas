@@ -2,13 +2,20 @@ package org.ca.cas.cert.biz;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.ca.cas.cert.biz.core.MakeCertBiz;
+import org.ca.cas.cert.biz.core.model.*;
+import org.ca.cas.cert.biz.core.model.Extension;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
+import org.ca.cas.user.domain.UserEntity;
+import org.ca.cas.user.enums.UserFailCodeEnum;
+import org.ca.cas.user.service.UserService;
+import org.ca.cas.user.vo.User;
 import org.ca.common.cert.enums.CertStatus;
 import org.ca.common.cert.enums.CertType;
 import org.ca.cas.cert.domain.CertEntity;
@@ -16,6 +23,7 @@ import org.ca.cas.cert.dto.EnrollCertRequestDto;
 import org.ca.cas.cert.dto.EnrollCertResponseDto;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.CertService;
+import org.ca.common.user.enums.UserRole;
 import org.ca.common.utils.KeyPairUtils;
 import org.ca.common.utils.X500NameUtils;
 import org.ca.ext.security.util.CertUtil;
@@ -58,6 +66,9 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
     @Resource
     private KeyContainerBiz keyContainerBiz;
 
+    @Resource
+    private UserService userService;
+
     private static CertificateFactory certificateFactory;
 
     @Override
@@ -96,6 +107,13 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         if (n > 0) {
             setFailureResult(CertFailEnum.E_BIZ_21002);
             return false;
+        }
+        UserEntity user = userService.get(requestDto.getUserId());
+        if (user == null) {
+            setFailureResult(FailureCodeEnum.E_BIZ_20003);
+            return false;
+        } else {
+            context.setAttr("user", user);
         }
         if (!requestDto.getSubjectDn().equals(requestDto.getIssueDn())) {
             entity = certService.findBy("subjectDn", requestDto.getIssueDn());
@@ -164,9 +182,16 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             calendar.setTime(startDate);
             calendar.add(Calendar.YEAR, 1);
             Date endDate = calendar.getTime();
-
-
-            X509Certificate certificate = makeCertBiz.gen(publicKey, signPrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, null);
+            List<org.ca.cas.cert.biz.core.model.Extension> extensions = new ArrayList<>();
+            UserEntity userEntity = (UserEntity) context.getAttr("user");
+            if (userEntity.getRole() == UserRole.CA_ADMIN.getCode()) {
+                Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, true, new BasicConstraints(2));
+                extensions.add(extension);
+            } else if (userEntity.getRole() == UserRole.RA_ADMIN.getCode()) {
+                Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, true, new BasicConstraints(1));
+                extensions.add(extension);
+            }
+            X509Certificate certificate = makeCertBiz.gen(publicKey, signPrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, extensions);
             try {
                 certificate.verify(signPublicKey);
             } catch (Exception e) {
@@ -220,15 +245,10 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            tmpEntity = certService.findBy("subjectDn", certEntity.getIssuerDn());
             if (tmpEntity.getSubjectDn().equals(tmpEntity.getIssuerDn())) {
-                try {
-                    x509Certs.add(certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(tmpEntity.getSignBuf()))));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 break;
             }
+            tmpEntity = certService.findBy("subjectDn", tmpEntity.getIssuerDn());
         }
         CMSProcessableByteArray cmsProc = new CMSProcessableByteArray("hi".getBytes());
 

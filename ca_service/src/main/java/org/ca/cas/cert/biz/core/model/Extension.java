@@ -8,6 +8,9 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
  */
 public class Extension {
     private ASN1ObjectIdentifier oid;
+    /**
+     * 是否是必备
+     */
     private boolean isCritical;
     private ASN1Encodable value;
 
