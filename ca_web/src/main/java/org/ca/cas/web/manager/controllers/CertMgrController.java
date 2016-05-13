@@ -1,8 +1,7 @@
 package org.ca.cas.web.manager.controllers;
 
 import org.apache.commons.codec.binary.Base64;
-import org.ca.cas.cert.dto.EnrollCertRequestDto;
-import org.ca.cas.cert.dto.EnrollCertResponseDto;
+import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
 import org.ca.cas.user.api.UserApi;
 import org.ca.cas.user.dto.QueryUserRequestDto;
@@ -10,8 +9,6 @@ import org.ca.cas.user.dto.QueryUserResponseDto;
 import org.ca.cas.user.vo.User;
 import org.ca.common.cert.enums.CertStatus;
 import org.ca.cas.cert.api.CertApi;
-import org.ca.cas.cert.dto.QueryCertRequestDto;
-import org.ca.cas.cert.dto.QueryCertResponseDto;
 import org.ca.common.user.enums.UserRole;
 import org.ca.kms.key.api.KeyApi;
 import org.ca.kms.key.dto.KeyQueryRequestDto;
@@ -63,11 +60,10 @@ public class CertMgrController extends BaseController {
 
     @RequestMapping("/initAdminCert.html")
     public String toInitAdminCert() {
-        KeyQueryRequestDto requestDto = new KeyQueryRequestDto();
-        requestDto.setKeyStatus(KeyStatus.READY.getCode());
-        Result<KeyQueryResponseDto> result = keyApi.queryKey(requestDto);
-        if (result.isSuccess()) {
-            List<Key> keys = result.getData().getKeyList();
+        ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
+        Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
+        if (listResult.isSuccess()) {
+            List<String> keys = listResult.getData().getAliases();
             request.setAttribute("keys", keys);
         }
         return "admin/certMgr/initAdminCert";

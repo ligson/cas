@@ -29,7 +29,7 @@ dependencies {
 }
 //排除resources文件
 jar {
-    exclude '**/*.properties', '**/*.xml', '**/*.vm', '**/*.txt', "**/META-INF/spring/**", "**/META-INF/mybatis/**", "**/cert_template/**"
+    exclude '**/*.properties', '**/*.xml', '**/*.vm', '**/*.txt', "**/META-INF/spring/**", "**/META-INF/mybatis/**", "**/cert_template/**", "**/keystore/**"
 }
 task copyConf {
     doLast {

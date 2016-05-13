@@ -2,10 +2,7 @@ package org.ca.cas.web.pub.controllers;
 
 import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.api.CertApi;
-import org.ca.cas.cert.dto.EnrollCertRequestDto;
-import org.ca.cas.cert.dto.EnrollCertResponseDto;
-import org.ca.cas.cert.dto.QueryCertRequestDto;
-import org.ca.cas.cert.dto.QueryCertResponseDto;
+import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
 import org.ca.cas.user.api.UserApi;
 import org.ca.cas.user.dto.*;
@@ -84,11 +81,10 @@ public class PubController extends BaseController {
 
     @RequestMapping("/initCert.html")
     public String toInitCert() {
-        KeyQueryRequestDto requestDto = new KeyQueryRequestDto();
-        requestDto.setKeyStatus(KeyStatus.READY.getCode());
-        Result<KeyQueryResponseDto> result = keyApi.queryKey(requestDto);
-        if (result.isSuccess()) {
-            List<Key> keys = result.getData().getKeyList();
+        ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
+        Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
+        if (listResult.isSuccess()) {
+            List<String> keys = listResult.getData().getAliases();
             request.setAttribute("keys", keys);
         }
         return "pub/initCert";

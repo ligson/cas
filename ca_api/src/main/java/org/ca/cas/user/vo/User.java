@@ -60,6 +60,11 @@ public class User implements Serializable {
      */
     private Integer role;
 
+    /***
+     * 父帐号
+     */
+    private String fatherUserId;
+
     public String getId() {
         return id;
     }
@@ -140,10 +145,19 @@ public class User implements Serializable {
         this.role = role;
     }
 
+    public String getFatherUserId() {
+        return fatherUserId;
+    }
+
+    public void setFatherUserId(String fatherUserId) {
+        this.fatherUserId = fatherUserId;
+    }
+
+
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", birth=" + birth +
                 ", name='" + name + '\'' +
                 ", sex=" + sex +
@@ -153,6 +167,7 @@ public class User implements Serializable {
                 ", registerDate=" + registerDate +
                 ", photo='" + photo + '\'' +
                 ", role=" + role +
+                ", fatherUserId='" + fatherUserId + '\'' +
                 '}';
     }
 }

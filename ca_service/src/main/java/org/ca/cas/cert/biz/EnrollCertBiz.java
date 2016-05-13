@@ -7,6 +7,8 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.ca.cas.cert.biz.core.MakeCertBiz;
+import org.ca.cas.common.biz.KeyContainerBiz;
+import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.common.cert.enums.CertStatus;
 import org.ca.common.cert.enums.CertType;
 import org.ca.cas.cert.domain.CertEntity;
@@ -16,6 +18,7 @@ import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.CertService;
 import org.ca.common.utils.KeyPairUtils;
 import org.ca.common.utils.X500NameUtils;
+import org.ca.ext.security.util.CertUtil;
 import org.ca.kms.key.api.KeyApi;
 import org.ca.kms.key.dto.*;
 import org.ca.kms.key.enums.KeyFailEnum;
@@ -32,11 +35,9 @@ import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.*;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,7 +56,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
     private MakeCertBiz makeCertBiz;
 
     @Resource
-    private KeyApi keyApi;
+    private KeyContainerBiz keyContainerBiz;
 
     private static CertificateFactory certificateFactory;
 
@@ -125,20 +126,35 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         KeyQueryRequestDto keyQueryRequestDto = new KeyQueryRequestDto();
         keyQueryRequestDto.setId(requestDto.getKeyId());
         keyQueryRequestDto.setPageAble(false);
-        Result<KeyQueryResponseDto> keyQueryResult = keyApi.queryKey(keyQueryRequestDto);
-        if (keyQueryResult.isSuccess()) {
-            KeyQueryResponseDto keyQueryResponseDto = keyQueryResult.getData();
-            Key key = keyQueryResponseDto.getKey();
-
-            PublicKey publicKey = KeyPairUtils.decodePublicKey(key.getPublicKey());
+        KeyPairContainer keyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
+        if (keyPairContainer != null) {
+            PublicKey publicKey = keyPairContainer.getPublicKey();
             //签名私钥
-            PrivateKey privateKey = null;
+            PrivateKey signPrivateKey = null;
+            //颁发者公钥
+            PublicKey signPublicKey = publicKey;
             if (!requestDto.getSubjectDn().equals(requestDto.getIssueDn())) {
-
+                CertEntity issueCert = (CertEntity) context.getAttr("issueCert");
+                try {
+                    Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issueCert.getSignBuf())));
+                    KeyPairContainer issueContainer = keyContainerBiz.getKeyPair(certificate.getPublicKey());
+                    if (issueContainer != null) {
+                        signPrivateKey = issueContainer.getPrivateKey();
+                        signPublicKey = issueContainer.getPublicKey();
+                    } else {
+                        setFailureResult(CertFailEnum.E_BIZ_21006);
+                        certService.delete(entity);
+                        return false;
+                    }
+                } catch (CertificateException e) {
+                    e.printStackTrace();
+                    setFailureResult(CertFailEnum.E_BIZ_21005);
+                    certService.delete(entity);
+                    return false;
+                }
             } else {
-                privateKey = KeyPairUtils.decodePrivateKey(key.getPrivateKey());
+                signPrivateKey = keyPairContainer.getPrivateKey();
             }
-
 
             X500Name issueDn = X500NameUtils.subjectToX500Name(requestDto.getIssueDn());
             X500Name subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
@@ -150,8 +166,15 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             Date endDate = calendar.getTime();
 
 
-            X509Certificate certificate = makeCertBiz.gen(publicKey, privateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, null);
-            //certificate.verify();
+            X509Certificate certificate = makeCertBiz.gen(publicKey, signPrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, null);
+            try {
+                certificate.verify(signPublicKey);
+            } catch (Exception e) {
+                e.printStackTrace();
+                setFailureResult(CertFailEnum.E_BIZ_21007);
+                certService.delete(entity);
+                return false;
+            }
             byte[] certBuf = null;
             byte[] certChainBuf = null;
             try {
@@ -173,6 +196,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
 
             } else {
                 setFailureResult(CertFailEnum.E_BIZ_21004);
+                certService.delete(entity);
                 return false;
             }
         }
@@ -231,20 +255,9 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
     public Boolean persistence() {
         CertEntity entity = (CertEntity) context.getAttr("entity");
         certService.update(entity);
-        responseDto.setSuccess(true);
         responseDto.setCertId(entity.getId());
-        ModifyKeyRequestDto modifyKeyRequestDto = new ModifyKeyRequestDto();
-        modifyKeyRequestDto.setId(requestDto.getKeyId());
-        modifyKeyRequestDto.setKeyStatus(KeyStatus.INUSE.getCode());
-        modifyKeyRequestDto.setUseTime(new Date());
-        Result<ModifyKeyResponseDto> modifyKeyResult = keyApi.modifyKey(modifyKeyRequestDto);
-        if (modifyKeyResult.isSuccess()) {
-            setSuccessResult();
-            return true;
-        } else {
-            setFailureResult(FailureCodeEnum.getByCode(modifyKeyResult.getFailureCode()));
-            return false;
-        }
+        setSuccessResult();
+        return true;
     }
 
     @Override

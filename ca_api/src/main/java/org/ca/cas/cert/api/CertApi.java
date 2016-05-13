@@ -27,5 +27,7 @@ public interface CertApi {
 
     Result<EnrollCertResponseDto> enrollCert(EnrollCertRequestDto requestDto);
 
+    Result<ListKeyStoreResponseDto> listKeyStore(ListKeyStoreRequestDto requestDto);
+
 
 }

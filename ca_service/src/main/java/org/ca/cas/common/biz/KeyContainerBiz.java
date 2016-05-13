@@ -18,6 +18,7 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -44,12 +45,13 @@ public class KeyContainerBiz implements InitializingBean {
 
         keyStore = KeyStore.getInstance("JKS");
         File keyJksFile = new File(keyJks);
-        if (!keyJksFile.exists()) {
-            keyJksFile.createNewFile();
-        }
-        if (keyJks.length() > 0) {
+        if (keyJksFile.exists() && keyJksFile.length() != 0) {
+            logger.info("开始加载已存在密钥库.........");
             keyStore.load(new FileInputStream(keyJks), keyPwd.toCharArray());
+            logger.info("加载已存在密钥库完成.........");
         } else {
+            keyJksFile.createNewFile();
+            keyStore.load(null, null);
             logger.info("初始化密钥库开始.........");
             keyStore.load(null, null);
             for (int i = 0; i < 20; i++) {
@@ -63,15 +65,15 @@ public class KeyContainerBiz implements InitializingBean {
 
         File certJksFile = new File(certJks);
         certStore = KeyStore.getInstance("JKS");
-        if (!certJksFile.exists()) {
-            certJksFile.createNewFile();
-        }
-
-        if (certJks.length() > 0) {
+        if (certJksFile.exists() && certJksFile.length() != 0) {
+            logger.info("开始加载已存在证书库.........");
             certStore.load(new FileInputStream(certJksFile), certPwd.toCharArray());
+            logger.info("加载已存在证书库完成.........");
         } else {
+            certJksFile.createNewFile();
             certStore.load(null, null);
         }
+
     }
 
     public void storeCert(String aliase, Certificate[] chain) {
@@ -164,6 +166,19 @@ public class KeyContainerBiz implements InitializingBean {
             e.printStackTrace();
         }
         return aliases;
+    }
+
+    public KeyPairContainer getKeyPair(PublicKey publicKey) {
+        List<String> keys = keyAliases();
+        for (String key : keys) {
+            KeyPairContainer container = getKeyPair(key);
+            if (container != null && container.getPublicKey() != null) {
+                if (Arrays.equals(container.getPublicKey().getEncoded(), publicKey.getEncoded())) {
+                    return container;
+                }
+            }
+        }
+        return null;
     }
 
     public KeyPairContainer getKeyPair(String aliase) {

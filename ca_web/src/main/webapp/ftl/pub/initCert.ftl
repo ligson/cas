@@ -49,8 +49,7 @@
             <div class="col-sm-8">
                 <select name="keyId" class="form-control">
                     <#list keys as key>
-                        <option value="${key.id}">${(key.keyType==2)?string("SM2","RSA")}
-                            (${key.keySize})-${key.id}</option>
+                        <option value="${key}">${key}</option>
                     </#list>
                 </select>
             </div>

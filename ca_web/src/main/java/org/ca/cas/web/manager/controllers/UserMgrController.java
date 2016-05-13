@@ -62,13 +62,15 @@ public class UserMgrController extends BaseController {
     @RequestMapping("/addUser.json")
     @ResponseBody
     public WebResult addUser(RegisterRequestDto requestDto) {
+        User user = (User) session.getAttribute("adminUser");
         int role = Integer.parseInt(request.getParameter("role"));
-        String birth = request.getParameter("birth");
+        //String birth = request.getParameter("birth");
         requestDto.setPassword(HashHelper.md5(requestDto.getPassword()));
         Result<RegisterResponseDto> registerResult = userApi.register(requestDto);
         if (registerResult.isSuccess()) {
             ModifyUserRequestDto modifyUserRequestDto = new ModifyUserRequestDto();
             modifyUserRequestDto.setId(registerResult.getData().getId());
+            modifyUserRequestDto.setFatherUserId(user.getId());
             modifyUserRequestDto.setRole(role);
             Result<ModifyUserResponseDto> modifyResult = userApi.modify(modifyUserRequestDto);
             if (modifyResult.isSuccess()) {

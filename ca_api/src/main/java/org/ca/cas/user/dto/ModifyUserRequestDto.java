@@ -62,6 +62,11 @@ public class ModifyUserRequestDto extends BaseRequestDto {
      */
     private Integer role;
 
+    /***
+     * 父帐号
+     */
+    private String fatherUserId;
+
     public String getId() {
         return id;
     }
@@ -134,10 +139,18 @@ public class ModifyUserRequestDto extends BaseRequestDto {
         this.role = role;
     }
 
+    public String getFatherUserId() {
+        return fatherUserId;
+    }
+
+    public void setFatherUserId(String fatherUserId) {
+        this.fatherUserId = fatherUserId;
+    }
+
     @Override
     public String toString() {
         return "ModifyUserRequestDto{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", birth=" + birth +
                 ", name='" + name + '\'' +
                 ", sex=" + sex +
@@ -146,6 +159,7 @@ public class ModifyUserRequestDto extends BaseRequestDto {
                 ", email='" + email + '\'' +
                 ", photo='" + photo + '\'' +
                 ", role=" + role +
+                ", fatherUserId='" + fatherUserId + '\'' +
                 '}';
     }
 }

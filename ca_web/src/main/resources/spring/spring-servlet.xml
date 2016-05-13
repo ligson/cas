@@ -74,7 +74,7 @@
             <mvc:mapping path="/admin"/>
             <mvc:exclude-mapping path="/admin/login.html"/>
             <mvc:exclude-mapping path="/admin/login.do"/>
-            <mvc:exclude-mapping path="/admin/*.json"/>
+            <mvc:exclude-mapping path="**.json"/>
             <bean class="org.ca.cas.web.interceptor.WebInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

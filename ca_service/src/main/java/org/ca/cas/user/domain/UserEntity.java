@@ -72,6 +72,11 @@ public class UserEntity extends BasicEntity {
      */
     private Integer role;
 
+    /***
+     * 父帐号
+     */
+    private String fatherUserId;
+
 
     @Id
     @GeneratedValue(generator = "dr.id")
@@ -173,5 +178,15 @@ public class UserEntity extends BasicEntity {
 
     public void setRole(Integer role) {
         this.role = role;
+    }
+
+
+    @Column(name = "father_user_id", columnDefinition = "varchar(32) comment '父帐号'")
+    public String getFatherUserId() {
+        return fatherUserId;
+    }
+
+    public void setFatherUserId(String fatherUserId) {
+        this.fatherUserId = fatherUserId;
     }
 }
