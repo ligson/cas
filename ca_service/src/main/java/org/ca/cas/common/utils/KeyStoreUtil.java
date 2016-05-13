@@ -12,8 +12,8 @@ import org.ca.ext.security.util.CertUtil;
 
 public class KeyStoreUtil {
     public static KeyStore keyStore = null;
-    public String password = "changeme";
-    public String jkspwd = "changeme";
+    public static String password = "changeme";
+    public static String jkspwd = "changeme";
     public static String jksPath = System.getProperty("user.home")
             + "/.topca/keystore";
 
@@ -23,7 +23,7 @@ public class KeyStoreUtil {
         if (!filePath.isDirectory()) {
             filePath.mkdir();
         }
-        File file = new File(jksPath + "/.keystore");
+        File file = new File(jksPath);
         if (!file.exists()) {
             file.createNewFile();
             keyStore.load(null, jkspwd.toCharArray());
@@ -39,7 +39,7 @@ public class KeyStoreUtil {
 
     public void genKey(String algorithm, int keysize,
                        int count) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-        File file = new File(jksPath + "\\.keystore");
+        File file = new File(jksPath);
         Certificate[] chain;
         for (int i = 0; i < count; i++) {
             KeyPair keyPair = genKeyPair(algorithm, keysize);
@@ -54,7 +54,7 @@ public class KeyStoreUtil {
 
     }
 
-    private KeyPair genKeyPair(String algorithm, int keysize) throws NoSuchAlgorithmException {
+    public static KeyPair genKeyPair(String algorithm, int keysize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator;
         keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
         keyPairGenerator.initialize(keysize);
@@ -81,7 +81,7 @@ public class KeyStoreUtil {
     }
 
     public void delkey(String alias) throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
-        File file = new File(jksPath + "\\.keystore");
+        File file = new File(jksPath);
         keyStore.deleteEntry(alias);
         FileOutputStream os = new FileOutputStream(file);
         keyStore.store(os, jkspwd.toCharArray());
@@ -134,7 +134,7 @@ public class KeyStoreUtil {
                 throw ex;
             }
         }
-        File file = new File(jksPath + "\\.keystore");
+        File file = new File(jksPath);
         FileOutputStream out = new FileOutputStream(file);
         keyStore.store(out, jkspwd.toCharArray());
     }

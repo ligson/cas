@@ -84,9 +84,9 @@ public class TSPRespGenerator {
 		} 
 
 		try {
-			security.pkix.PKIFreeText ifreeText = null;
+			org.ca.ext.security.pkix.PKIFreeText ifreeText = null;
 			if(statusStrings!=null && statusStrings.length<=0)
-				ifreeText = new security.pkix.PKIFreeText(statusStrings);
+				ifreeText = new org.ca.ext.security.pkix.PKIFreeText(statusStrings);
 			PKIFailureInfo failureInfo = null;
 			if(failInfo!=0)
 				failureInfo  = new PKIFailureInfo(failInfo);
@@ -94,7 +94,7 @@ public class TSPRespGenerator {
 					new PKIStatusInfo(new PKIStatus(status),
 							ifreeText, 
 							failureInfo),
-							new security.tsp.TimeStampToken(
+							new org.ca.ext.security.tsp.TimeStampToken(
 									tstTokenContentInfo));
 		} catch (org.bouncycastle.tsp.TSPException e) {
 			throw new TSPException(e.getMessage(), e);

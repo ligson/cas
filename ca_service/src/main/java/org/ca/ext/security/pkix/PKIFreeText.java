@@ -2,7 +2,7 @@ package org.ca.ext.security.pkix;
 
 import java.util.Vector;
 
-import asn1.DERUTF8String;
+import org.ca.ext.asn1.DERUTF8String;
 
 
 

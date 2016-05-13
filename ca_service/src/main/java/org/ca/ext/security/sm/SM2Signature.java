@@ -1,6 +1,6 @@
 package org.ca.ext.security.sm;
 
-import static pkiutil.DataUtil.trimZeroes;
+import static org.ca.ext.pkiutil.DataUtil.trimZeroes;
 
 import java.io.IOException;
 import java.math.BigInteger;

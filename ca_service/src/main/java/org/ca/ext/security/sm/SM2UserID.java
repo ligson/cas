@@ -3,7 +3,7 @@ package org.ca.ext.security.sm;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidParameterException;
 
-import common.TopSystem;
+import org.ca.ext.common.TopSystem;
 
 /**
  * SM2 algorithm parameter specification is a constant, but this is used for SM2

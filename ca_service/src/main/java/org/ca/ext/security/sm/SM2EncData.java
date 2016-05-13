@@ -9,7 +9,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.ca.ext.security.util.DerInputStream;
 import org.ca.ext.security.util.DerOutputStream;
 import org.ca.ext.security.util.DerValue;
-import static pkiutil.DataUtil.*;
+import static org.ca.ext.pkiutil.DataUtil.*;
 
 public class SM2EncData {
 	private ECPoint c1Point;

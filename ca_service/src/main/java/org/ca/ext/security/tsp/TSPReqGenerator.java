@@ -91,7 +91,7 @@ public class TSPReqGenerator {
 				tsReq.getExtensions().add(oid, bcreq.getExtensionValue(oid), false);
 			}
 		}
-		tsReq.setMessageImprint(new security.tsp.MessageImprint(
+		tsReq.setMessageImprint(new org.ca.ext.security.tsp.MessageImprint(
 				bcreq.getMessageImprintAlgOID(),
 				bcreq.getMessageImprintDigest()));
 

@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import asn1.DERUTF8String;
+import org.ca.ext.asn1.DERUTF8String;
 import org.ca.ext.security.pkix.PKIFailureInfo;
 import org.ca.ext.security.pkix.PKIFreeText;
 import org.ca.ext.security.pkix.PKIStatus;

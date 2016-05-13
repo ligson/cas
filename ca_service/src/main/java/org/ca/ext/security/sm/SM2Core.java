@@ -7,7 +7,7 @@ import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import org.ca.ext.security.ec.ECUtil;
 import org.ca.ext.security.ec.NamedCurve;
-import static pkiutil.DataUtil.*;
+import static org.ca.ext.pkiutil.DataUtil.*;
 
 public final class SM2Core {
 	protected final static ECParameterSpec sm2Curve = NamedCurve.getECParameterSpec("SM2");

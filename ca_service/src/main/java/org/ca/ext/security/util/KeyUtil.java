@@ -28,7 +28,7 @@ import javax.crypto.SecretKey;
 
 import org.apache.commons.codec.binary.Hex;
 
-import common.Debug;
+import org.ca.ext.common.Debug;
 import org.ca.ext.security.ec.ECParameters;
 import org.ca.ext.security.ec.NamedCurve;
 import org.ca.ext.security.sm.SM2PublicKey;
