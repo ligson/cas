@@ -76,8 +76,13 @@ $(function () {
             }
             },
             {
-                field: "userId", title: "查看用户", formatter: function (value, row, idx) {
-                return "<a href='/ca/admin/userMgr/view.html?userId=" + row.userId + "'>查1看</a>";
+                field: "userId", title: "用户信息", formatter: function (value, row, idx) {
+                return "<a href='/ca/admin/userMgr/view.html?userId=" + row.userId + "'>查看</a>";
+            }
+            },
+            {
+                field: "downloadCert", title: "证书信息", formatter: function (value, row, idx) {
+                return "<a href='/ca/admin/certMgr/download.do?certId=" + row.id + "'>查看</a>";
             }
             }
         ]],

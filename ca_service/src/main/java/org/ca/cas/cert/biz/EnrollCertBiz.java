@@ -97,12 +97,12 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             return false;
         }
         if (!requestDto.getSubjectDn().equals(requestDto.getIssueDn())) {
-            entity = new CertEntity();
-            entity.setIssuerDn(requestDto.getIssueDn());
-            n = certService.countByAnd(entity);
-            if (n > 0) {
+            entity = certService.findBy("subjectDn", requestDto.getIssueDn());
+            if (entity == null) {
                 setFailureResult(CertFailEnum.E_BIZ_21003);
                 return false;
+            } else {
+                context.setAttr("issueCert", entity);
             }
         }
         return true;
@@ -129,8 +129,15 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         if (keyQueryResult.isSuccess()) {
             KeyQueryResponseDto keyQueryResponseDto = keyQueryResult.getData();
             Key key = keyQueryResponseDto.getKey();
-            PrivateKey privateKey = KeyPairUtils.decodePrivateKey(key.getPrivateKey());
+
             PublicKey publicKey = KeyPairUtils.decodePublicKey(key.getPublicKey());
+            //签名私钥
+            PrivateKey privateKey = null;
+            if (!requestDto.getSubjectDn().equals(requestDto.getIssueDn())) {
+
+            } else {
+                privateKey = KeyPairUtils.decodePrivateKey(key.getPrivateKey());
+            }
 
 
             X500Name issueDn = X500NameUtils.subjectToX500Name(requestDto.getIssueDn());
@@ -142,7 +149,9 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             calendar.add(Calendar.YEAR, 1);
             Date endDate = calendar.getTime();
 
+
             X509Certificate certificate = makeCertBiz.gen(publicKey, privateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, null);
+            //certificate.verify();
             byte[] certBuf = null;
             byte[] certChainBuf = null;
             try {

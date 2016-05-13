@@ -109,6 +109,11 @@ public class UserMgrController extends BaseController {
         requestDto.setId(user.getId());
         Result<ModifyUserResponseDto> modifyResult = userApi.modify(requestDto);
         if (modifyResult.isSuccess()) {
+            QueryUserRequestDto requestDto1 = new QueryUserRequestDto();
+            requestDto1.setId(user.getId());
+            requestDto1.setPageAble(false);
+            Result<QueryUserResponseDto> queryResult = userApi.query(requestDto1);
+            session.setAttribute("adminUser", queryResult.getData().getUser());
             return redirect("/admin/userMgr/view.html?userId=" + user.getId());
         } else {
             model.addAttribute("errorMsg", modifyResult.getFailureMessage());

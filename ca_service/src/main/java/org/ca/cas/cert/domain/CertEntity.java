@@ -5,7 +5,6 @@ import org.hibernate.annotations.GenericGenerator;
 import org.ligson.fw.core.entity.BasicEntity;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.util.Date;
 
 import static javax.persistence.FetchType.LAZY;

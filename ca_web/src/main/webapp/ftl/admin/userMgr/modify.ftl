@@ -48,7 +48,7 @@
     <div class="form-group row">
         <label class="col-sm-3" for="birth1">出生日期</label>
         <div class="col-sm-6">
-            <input class="form-control easyui-datebox" name="birth" id="birth1" value="${adminUser.birth}"/>
+            <input class="form-control easyui-datebox" name="birth" id="birth1" value="${adminUser.birth??}"/>
         </div>
     </div>
     <div class="form-group row">
