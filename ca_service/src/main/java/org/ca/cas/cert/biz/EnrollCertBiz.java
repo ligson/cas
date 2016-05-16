@@ -7,15 +7,13 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.ca.cas.cert.biz.core.MakeCertBiz;
-import org.ca.cas.cert.biz.core.model.*;
 import org.ca.cas.cert.biz.core.model.Extension;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.cas.user.domain.UserEntity;
-import org.ca.cas.user.enums.UserFailCodeEnum;
 import org.ca.cas.user.service.UserService;
-import org.ca.cas.user.vo.User;
 import org.ca.common.cert.enums.CertStatus;
 import org.ca.common.cert.enums.CertType;
 import org.ca.cas.cert.domain.CertEntity;
@@ -24,24 +22,15 @@ import org.ca.cas.cert.dto.EnrollCertResponseDto;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.CertService;
 import org.ca.common.user.enums.UserRole;
-import org.ca.common.utils.KeyPairUtils;
 import org.ca.common.utils.X500NameUtils;
-import org.ca.ext.security.util.CertUtil;
-import org.ca.kms.key.api.KeyApi;
-import org.ca.kms.key.dto.*;
-import org.ca.kms.key.enums.KeyFailEnum;
-import org.ca.kms.key.enums.KeyStatus;
-import org.ca.kms.key.vo.Key;
 import org.ligson.fw.core.common.biz.AbstractBiz;
 import org.ligson.fw.core.facade.annotation.Api;
-import org.ligson.fw.core.facade.base.result.Result;
 import org.ligson.fw.core.facade.enums.FailureCodeEnum;
 import org.ligson.fw.string.encode.HashHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.*;
@@ -123,12 +112,13 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             } else {
                 context.setAttr("issueCert", entity);
             }
+        } else {
+            context.setAttr("isRootCert", true);
         }
         return true;
     }
 
-    @Override
-    public Boolean txnPreProcessing() {
+    private CertEntity certPreAdd() {
         CertEntity entity = new CertEntity();
         entity.setStatus(CertStatus.ENROLL.getCode());
         entity.setSubjectDn(requestDto.getSubjectDn());
@@ -139,43 +129,59 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         entity.setCertType(CertType.SIGN.getCode());
         entity.setIssuerDn(requestDto.getIssueDn());
         entity.setIssuerDnHashMd5(requestDto.getIssueDnHashMd5());
+        if (requestDto.getCsr() != null) {
+            entity.setReqBuf(requestDto.getCsr());
+            entity.setReqBufType(1);
+        }
         certService.add(entity);
+        return entity;
+    }
 
-        KeyQueryRequestDto keyQueryRequestDto = new KeyQueryRequestDto();
-        keyQueryRequestDto.setId(requestDto.getKeyId());
-        keyQueryRequestDto.setPageAble(false);
-        KeyPairContainer keyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
-        if (keyPairContainer != null) {
-            PublicKey publicKey = keyPairContainer.getPublicKey();
-            //签名私钥
-            PrivateKey signPrivateKey = null;
-            //颁发者公钥
-            PublicKey signPublicKey = publicKey;
-            if (!requestDto.getSubjectDn().equals(requestDto.getIssueDn())) {
-                CertEntity issueCert = (CertEntity) context.getAttr("issueCert");
+    @Override
+    public Boolean txnPreProcessing() {
+        CertEntity entity = certPreAdd();
+        PublicKey issuePublicKey;
+        PrivateKey issuePrivateKey;
+        PublicKey userPublicKey;
+        X500Name subjectDn;
+        if (context.getAttr("isRootCert") != null) {
+            //issue root cert
+            KeyPairContainer keyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
+            issuePublicKey = keyPairContainer.getPublicKey();
+            issuePrivateKey = keyPairContainer.getPrivateKey();
+            userPublicKey = keyPairContainer.getPublicKey();
+            subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
+        } else {
+            CertEntity issueCert = (CertEntity) context.getAttr("issueCert");
+            Certificate certificate = null;
+            try {
+                certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issueCert.getSignBuf())));
+            } catch (CertificateException e) {
+                setFailureResult(CertFailEnum.E_BIZ_21006);
+                certService.delete(entity);
+                return false;
+            }
+            KeyPairContainer issueContainer = keyContainerBiz.getKeyPair(certificate.getPublicKey());
+            issuePublicKey = issueContainer.getPublicKey();
+            issuePrivateKey = issueContainer.getPrivateKey();
+            if (requestDto.getKeyId() != null) {
+                KeyPairContainer userkeyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
+                userPublicKey = userkeyPairContainer.getPublicKey();
+                subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
+            } else {
+                byte[] buffer = Base64.decodeBase64(requestDto.getCsr());
+                PKCS10CertificationRequest request = new PKCS10CertificationRequest(buffer);
                 try {
-                    Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issueCert.getSignBuf())));
-                    KeyPairContainer issueContainer = keyContainerBiz.getKeyPair(certificate.getPublicKey());
-                    if (issueContainer != null) {
-                        signPrivateKey = issueContainer.getPrivateKey();
-                        signPublicKey = issueContainer.getPublicKey();
-                    } else {
-                        setFailureResult(CertFailEnum.E_BIZ_21006);
-                        certService.delete(entity);
-                        return false;
-                    }
-                } catch (CertificateException e) {
+                    userPublicKey = request.getPublicKey();
+                    subjectDn = X500NameUtils.subjectToX500Name(request.getCertificationRequestInfo().getSubject().toString());
+                } catch (Exception e) {
                     e.printStackTrace();
-                    setFailureResult(CertFailEnum.E_BIZ_21005);
-                    certService.delete(entity);
+                    setFailureResult(CertFailEnum.E_BIZ_21008);
                     return false;
                 }
-            } else {
-                signPrivateKey = keyPairContainer.getPrivateKey();
             }
-
             X500Name issueDn = X500NameUtils.subjectToX500Name(requestDto.getIssueDn());
-            X500Name subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
+
 
             Date startDate = requestDto.getStartDate();
             Calendar calendar = Calendar.getInstance();
@@ -191,9 +197,10 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, true, new BasicConstraints(1));
                 extensions.add(extension);
             }
-            X509Certificate certificate = makeCertBiz.gen(publicKey, signPrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, extensions);
+            X509Certificate userCertObj = makeCertBiz.gen(userPublicKey, issuePrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, extensions);
+
             try {
-                certificate.verify(signPublicKey);
+                userCertObj.verify(issuePublicKey);
             } catch (Exception e) {
                 e.printStackTrace();
                 setFailureResult(CertFailEnum.E_BIZ_21007);
@@ -203,22 +210,23 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             byte[] certBuf = null;
             byte[] certChainBuf = null;
             try {
-                certBuf = certificate.getEncoded();
+                certBuf = userCertObj.getEncoded();
                 entity.setSignBuf(Base64.encodeBase64String(certBuf));
                 certChainBuf = getCertChain(entity, certBuf);
             } catch (CertificateEncodingException e) {
                 e.printStackTrace();
+                setFailureResult(CertFailEnum.E_BIZ_21004);
+                certService.delete(entity);
+                return false;
             }
-            if (certificate != null && certBuf != null) {
+            if (userCertObj != null && certBuf != null) {
                 entity.setStatus(CertStatus.VALID.getCode());
                 entity.setNotAfter(endDate);
                 entity.setNotBefore(startDate);
                 entity.setReqOverrideValidity(365);
                 entity.setSerialNumber(entity.getId());
                 entity.setCertPin(requestDto.getCertPin());
-
                 entity.setSignBufP7(Base64.encodeBase64String(certChainBuf));
-
             } else {
                 setFailureResult(CertFailEnum.E_BIZ_21004);
                 certService.delete(entity);
@@ -256,15 +264,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         try {
             gen.addCertificates(new JcaCertStore(x509Certs));
             return gen.generate(cmsProc, "BC").getEncoded();
-        } catch (CMSException e) {
-            e.printStackTrace();
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

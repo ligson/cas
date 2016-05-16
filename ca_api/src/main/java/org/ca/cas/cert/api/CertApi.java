@@ -29,5 +29,9 @@ public interface CertApi {
 
     Result<ListKeyStoreResponseDto> listKeyStore(ListKeyStoreRequestDto requestDto);
 
+    Result<ListUserKeyResponseDto> listUserKey(ListUserKeyRequestDto requestDto);
+
+    Result<GenCsrResponseDto> genCsr(GenCsrRequestDto requestDto);
+
 
 }
