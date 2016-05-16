@@ -80,7 +80,7 @@ public class LoginBiz extends AbstractBiz<LoginRequestDto, LoginResponseDto> {
             setFailureResult(UserFailCodeEnum.E_BIZ_20002);
             return false;
         }
-        context.setAttr("entity",entity);
+        context.setAttr("entity", entity);
         return true;
     }
 
