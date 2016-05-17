@@ -1,5 +1,6 @@
 package org.ca.cas.web.manager.controllers;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
 import org.ca.cas.user.api.UserApi;
@@ -8,6 +9,7 @@ import org.ca.cas.user.dto.QueryUserResponseDto;
 import org.ca.cas.user.vo.User;
 import org.ca.common.cert.enums.CertStatus;
 import org.ca.cas.cert.api.CertApi;
+import org.ca.common.cert.enums.CertType;
 import org.ca.common.user.enums.UserRole;
 import org.ca.kms.key.api.KeyApi;
 import org.ligson.fw.core.facade.base.result.Result;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -210,5 +214,53 @@ public class CertMgrController extends BaseController {
         }
         webResult.setSuccess(true);
         return webResult;
+    }
+
+    @ResponseBody
+    @RequestMapping("/genCrl.json")
+    public WebResult genCrl() {
+        User user = (User) session.getAttribute("adminUser");
+        GenCrlRequestDto genCrlRequestDto = new GenCrlRequestDto();
+        genCrlRequestDto.setAdminId(user.getId());
+        Result<GenCrlResponseDto> result = certApi.genCrl(genCrlRequestDto);
+        if (result.isSuccess()) {
+            webResult.setSuccess(true);
+        } else {
+            webResult.setError(result);
+        }
+        return webResult;
+    }
+
+    @RequestMapping("/downloadCrl.do")
+    public void downloadCrl() {
+        User user = (User) session.getAttribute("adminUser");
+        QueryCertRequestDto queryCertRequestDto = new QueryCertRequestDto();
+        queryCertRequestDto.setUserId(user.getId());
+        queryCertRequestDto.setCertType(CertType.SIGN.getCode());
+        queryCertRequestDto.setPageAble(false);
+        Result<QueryCertResponseDto> queryCertResult = certApi.queryCert(queryCertRequestDto);
+        String serialNumber = queryCertResult.getData().getCert().getSerialNumber();
+        DownloadCrlRequestDto downloadCrlRequestDto = new DownloadCrlRequestDto();
+        downloadCrlRequestDto.setCaCertSerialNumber(serialNumber);
+        Result<DownloadCrlResponseDto> downloadResult = certApi.downloadCrl(downloadCrlRequestDto);
+        if (downloadResult.isSuccess()) {
+            byte[] crlBuf = Base64.decodeBase64(downloadResult.getData().getCrl());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+            response.setContentType("application/pkix-crl");
+            response.setContentLength(crlBuf.length);
+            try {
+                response.setHeader("Content-Disposition", "attachment;filename=\"" + java.net.URLEncoder.encode(sdf.format(new Date()) + ".crl", "UTF-8") + "\"");
+                response.getOutputStream().write(crlBuf);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        response.setContentType("text/html");
+        try {
+            response.getWriter().println(downloadResult.getFailureMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

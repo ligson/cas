@@ -32,6 +32,12 @@ public class CertApiImpl implements CertApi {
     @Resource
     private RevokeListBiz revokeListBiz;
 
+    @Resource
+    private GenCrlBiz genCrlBiz;
+
+    @Resource
+    private DownloadCrlBiz downloadCrlBiz;
+
     @Override
     public Result<IssueCertResponseDto> issueCert(IssueCertRequestDto requestDto) {
         return null;
@@ -70,5 +76,15 @@ public class CertApiImpl implements CertApi {
     @Override
     public Result<RevokeListResponseDto> revokeQuery(RevokeListRequestDto revokeListRequestDto) {
         return revokeListBiz.operation(revokeListRequestDto);
+    }
+
+    @Override
+    public Result<GenCrlResponseDto> genCrl(GenCrlRequestDto requestDto) {
+        return genCrlBiz.operation(requestDto);
+    }
+
+    @Override
+    public Result<DownloadCrlResponseDto> downloadCrl(DownloadCrlRequestDto requestDto) {
+        return downloadCrlBiz.operation(requestDto);
     }
 }

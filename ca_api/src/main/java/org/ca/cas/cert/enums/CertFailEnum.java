@@ -19,6 +19,9 @@ public class CertFailEnum extends FailureCodeEnum {
     public static final CertFailEnum E_BIZ_21008 = new CertFailEnum("E_BIZ_21008", "CSR证书公钥无效");
     public static final CertFailEnum E_BIZ_21009 = new CertFailEnum("E_BIZ_21009", "证书不存在");
     public static final CertFailEnum E_BIZ_21010 = new CertFailEnum("E_BIZ_21010", "证书状态无效");
+    public static final CertFailEnum E_BIZ_21011 = new CertFailEnum("E_BIZ_21011", "CRL组装失败无效");
+    public static final CertFailEnum E_BIZ_21012 = new CertFailEnum("E_BIZ_21012", "没有吊销的证书");
+    public static final CertFailEnum E_BIZ_21013 = new CertFailEnum("E_BIZ_21013", "CRL不存在");
 
 
     /**

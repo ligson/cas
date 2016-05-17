@@ -56,7 +56,23 @@ $(function () {
             iconCls: 'icon-ok',
             handler: function () {
                 //showRevokeDlg();
+                $.post(baseUrl + "ca/admin/certMgr/genCrl.json", {}, function (data) {
+                    if (data.success) {
+                        alert("生成成功");
+                    } else {
+                        alert("生成失败," + data.errorMsg);
+                    }
+                }, "json");
             }
-        }]
+        },
+            {
+                id: 'downloadCrl',
+                text: "下载CRL",
+                iconCls: 'icon-save',
+                handler: function () {
+                    window.location.href = baseUrl + "ca/certMgr/downloadCrl.do";
+                }
+            }
+        ]
     });
 });

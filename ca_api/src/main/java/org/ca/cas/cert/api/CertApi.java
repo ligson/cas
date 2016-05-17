@@ -37,5 +37,8 @@ public interface CertApi {
 
     Result<RevokeListResponseDto> revokeQuery(RevokeListRequestDto revokeListRequestDto);
 
+    Result<GenCrlResponseDto> genCrl(GenCrlRequestDto requestDto);
+
+    Result<DownloadCrlResponseDto> downloadCrl(DownloadCrlRequestDto requestDto);
 
 }
