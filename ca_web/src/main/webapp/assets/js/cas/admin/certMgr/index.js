@@ -86,21 +86,48 @@ $(function () {
             }
             }
         ]],
-        nowrap: false
-        /*toolbar: [{
-         id: 'btnadd',
-         text: '生成密钥对',
-         iconCls: 'icon-ok',
-         handler: function () {
-         showGenKeyDlg();
-         }
-         }, {
-         id: 'btndelete',
-         text: '批量删除',
-         iconCls: 'icon-cut',
-         handler: function () {
-         deleteArticle();
-         }
-         }]*/
+        nowrap: false,
+        toolbar: [{
+            id: 'revokeBtn',
+            text: '吊销',
+            iconCls: 'icon-ok',
+            handler: function () {
+                showRevokeDlg();
+            }
+        }]
     });
 });
+function showRevokeDlg() {
+    var userGrid = $("#tt");
+    var rows = userGrid.datagrid("getSelections");
+    if (rows.length == 0) {
+        alert("请选择要吊销的证书");
+        return;
+    }
+    var certIds = "";
+    for (var i = 0; i < rows.length; i++) {
+        if (i != rows.length - 1) {
+            certIds += rows[i].id + ",";
+        } else {
+            certIds += rows[i].id;
+        }
+    }
+    $("#revokeDlg").dialog("open");
+    $("#revokeForm").find("input[name=certIds]").val(certIds);
+}
+function revokeCert() {
+    var userGrid = $("#tt");
+    var form = $("#revokeForm");
+    form.form("submit", {
+        success: function (data) {
+            var data = eval('(' + data + ')');  // change the JSON string to javascript object
+            if (data.success) {
+                form.form("clear");
+                $("#revokeDlg").dialog("close");
+                userGrid.datagrid("reload");
+            } else {
+                alert(data.errorMsg);
+            }
+        }
+    });
+}

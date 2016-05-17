@@ -33,5 +33,9 @@ public interface CertApi {
 
     Result<GenCsrResponseDto> genCsr(GenCsrRequestDto requestDto);
 
+    Result<RevokeCertResponseDto> revokeCert(RevokeCertRequestDto revokeCertRequestDto);
+
+    Result<RevokeListResponseDto> revokeQuery(RevokeListRequestDto revokeListRequestDto);
+
 
 }

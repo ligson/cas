@@ -1,6 +1,5 @@
 package org.ca.cas.web.manager.controllers;
 
-import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
 import org.ca.cas.user.api.UserApi;
@@ -11,10 +10,6 @@ import org.ca.common.cert.enums.CertStatus;
 import org.ca.cas.cert.api.CertApi;
 import org.ca.common.user.enums.UserRole;
 import org.ca.kms.key.api.KeyApi;
-import org.ca.kms.key.dto.KeyQueryRequestDto;
-import org.ca.kms.key.dto.KeyQueryResponseDto;
-import org.ca.kms.key.enums.KeyStatus;
-import org.ca.kms.key.vo.Key;
 import org.ligson.fw.core.facade.base.result.Result;
 import org.ligson.fw.string.encode.HashHelper;
 import org.ligson.fw.web.controller.BaseController;
@@ -57,6 +52,7 @@ public class CertMgrController extends BaseController {
         }
         return "admin/certMgr/index";
     }
+
 
     @RequestMapping("/initAdminCert.html")
     public String toInitAdminCert() {
@@ -145,6 +141,32 @@ public class CertMgrController extends BaseController {
         return webResult;
     }
 
+    @RequestMapping("/revokeCertList.html")
+    public String toRevokeCertList() {
+        return "admin/certMgr/revokeCertList";
+    }
+
+    @ResponseBody
+    @RequestMapping("/revokeCertList.json")
+    public WebResult revokeCertList(RevokeListRequestDto requestDto) {
+        String pageString = request.getParameter("page");
+        int page = Integer.parseInt(pageString);
+        requestDto.setPageNum(page);
+        String rowString = request.getParameter("rows");
+        int rows = Integer.parseInt(rowString);
+        requestDto.setPageSize(rows);
+        Result<RevokeListResponseDto> result = certApi.revokeQuery(requestDto);
+        if (result.isSuccess()) {
+            webResult.put("total", result.getData().getTotalCount());
+            webResult.put("rows", result.getData().getRevokeCertList());
+            webResult.setSuccess(true);
+        } else {
+            webResult.setError(result);
+        }
+        return webResult;
+    }
+
+
     @RequestMapping("/waitApproveCertList.html")
     public String toWaitApproveCertList() {
         return "admin/certMgr/waitApproveCertList";
@@ -168,6 +190,25 @@ public class CertMgrController extends BaseController {
         } else {
             webResult.setError(result);
         }
+        return webResult;
+    }
+
+    @ResponseBody
+    @RequestMapping("/revokeCert.json")
+    public WebResult revokeCert(String[] certIds, int revokeReason) {
+        User user = (User) session.getAttribute("adminUser");
+        for (String certId : certIds) {
+            RevokeCertRequestDto revokeCertRequestDto = new RevokeCertRequestDto();
+            revokeCertRequestDto.setAdminId(user.getId());
+            revokeCertRequestDto.setCertId(certId);
+            revokeCertRequestDto.setRevokeReason(revokeReason);
+            Result<RevokeCertResponseDto> revokeResult = certApi.revokeCert(revokeCertRequestDto);
+            if (!revokeResult.isSuccess()) {
+                webResult.setError(revokeResult);
+                return webResult;
+            }
+        }
+        webResult.setSuccess(true);
         return webResult;
     }
 }

@@ -15,7 +15,7 @@
         <div title="证书管理" data-options="iconCls:'icon-ok'" style="overflow:auto;padding:10px;">
             <ul class="easyui-tree">
                 <li><a href="${basePath}admin/certMgr/index.html">证书列表</a></li>
-                <li><a href="${basePath}admin/certMgr/waitApproveCertList.html">待批准证书列表</a></li>
+                <li><a href="${basePath}admin/certMgr/revokeCertList.html">吊销证书列表</a></li>
             </ul>
         </div>
     </div>

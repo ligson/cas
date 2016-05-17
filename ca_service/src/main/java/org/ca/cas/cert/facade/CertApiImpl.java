@@ -2,10 +2,7 @@ package org.ca.cas.cert.facade;
 
 import org.ca.cas.cert.ListUserKeyBiz;
 import org.ca.cas.cert.api.CertApi;
-import org.ca.cas.cert.biz.EnrollCertBiz;
-import org.ca.cas.cert.biz.GenCsrBiz;
-import org.ca.cas.cert.biz.ListKeyStoreBiz;
-import org.ca.cas.cert.biz.QueryCertBiz;
+import org.ca.cas.cert.biz.*;
 import org.ca.cas.cert.dto.*;
 import org.ligson.fw.core.facade.base.result.Result;
 
@@ -28,6 +25,12 @@ public class CertApiImpl implements CertApi {
 
     @Resource
     private ListUserKeyBiz listUserKeyBiz;
+
+    @Resource
+    private RevokeCertBiz revokeCertBiz;
+
+    @Resource
+    private RevokeListBiz revokeListBiz;
 
     @Override
     public Result<IssueCertResponseDto> issueCert(IssueCertRequestDto requestDto) {
@@ -57,5 +60,15 @@ public class CertApiImpl implements CertApi {
     @Override
     public Result<GenCsrResponseDto> genCsr(GenCsrRequestDto requestDto) {
         return genCsrBiz.operation(requestDto);
+    }
+
+    @Override
+    public Result<RevokeCertResponseDto> revokeCert(RevokeCertRequestDto revokeCertRequestDto) {
+        return revokeCertBiz.operation(revokeCertRequestDto);
+    }
+
+    @Override
+    public Result<RevokeListResponseDto> revokeQuery(RevokeListRequestDto revokeListRequestDto) {
+        return revokeListBiz.operation(revokeListRequestDto);
     }
 }

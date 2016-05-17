@@ -1,5 +1,6 @@
 package org.ca.cas.common.filter;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.ligson.fw.core.common.biz.AbstractBiz;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 
 /**
@@ -19,6 +21,8 @@ import java.lang.annotation.Annotation;
 public class MethodInvoker implements MethodInterceptor {
     private static final String PERFIX = "=============>";
     private static Logger logger = LoggerFactory.getLogger(MethodInvoker.class);
+    @Resource
+    private DruidDataSource dataSource;
 
 
     @Override
@@ -52,6 +56,7 @@ public class MethodInvoker implements MethodInterceptor {
                         long end = System.currentTimeMillis();
                         logger.debug("{}调用完成:{}【{}】，耗时{}ms", PERFIX, api.name(), bizClass.getName(), end - start);
                         logger.debug("/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=");
+                        dataSource.getConnection().close();
                     }
                     return result;
                 }
