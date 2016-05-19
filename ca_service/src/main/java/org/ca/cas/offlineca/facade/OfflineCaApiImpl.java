@@ -4,12 +4,14 @@ import org.ca.cas.offlineca.api.OfflineCaApi;
 import org.ca.cas.offlineca.biz.*;
 import org.ca.cas.offlineca.dto.*;
 import org.ligson.fw.core.facade.base.result.Result;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
  * Created by ligson on 2016/5/18.
  */
+@Component("offlineCaApi")
 public class OfflineCaApiImpl implements OfflineCaApi {
 
     @Resource

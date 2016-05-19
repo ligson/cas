@@ -1,11 +1,12 @@
 package org.ca.cas.offlineca.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by ligson on 2016/5/18.
  */
-public class OfflineCaCert {
+public class OfflineCaCert implements Serializable {
     /***
      * 证书id
      */

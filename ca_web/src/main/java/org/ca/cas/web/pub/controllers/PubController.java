@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.api.CertApi;
 import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
+import org.ca.cas.offlineca.api.OfflineCaApi;
 import org.ca.cas.user.api.UserApi;
 import org.ca.cas.user.dto.*;
 import org.ca.common.user.enums.UserRole;
@@ -36,9 +37,8 @@ public class PubController extends BaseController {
 
     @Resource
     private CertApi certApi;
-
     @Resource
-    private KeyApi keyApi;
+    private OfflineCaApi offlineCaApi;
 
     @RequestMapping("/")
     public String index() {

@@ -27,5 +27,9 @@
                      interface="org.ca.cas.cert.api.CertApi"
                      timeout="${dubbo.ca.consumer.timeout}"
                      version="${dubbo.ca.iterface.version}"/>
+    <dubbo:reference id="offlineCaApi"
+                     interface="org.ca.cas.offlineca.api.OfflineCaApi"
+                     timeout="${dubbo.ca.consumer.timeout}"
+                     version="${dubbo.ca.iterface.version}"/>
 
 </beans>
