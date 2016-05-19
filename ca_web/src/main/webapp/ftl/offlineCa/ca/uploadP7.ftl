@@ -1,49 +1,38 @@
-<@override name="title">创建自签名证书</@override>
+<@override name="title">导入P7证书</@override>
 <@override name="header">
-<link type="text/css" rel="stylesheet" href="${assetsPath}js/lib/bootstrap-validator/css/bootstrapValidator.css">
-<script type="text/javascript" src="${assetsPath}js/lib/bootstrap-validator/js/bootstrapValidator.js"></script>
-<script type="text/javascript" src="${assetsPath}js/cas/offlineca/ca/createSelfCert.js"></script>
 </@override>
 <@override name="body">
 <div class="col-sm-4"></div>
 <div class="col-sm-4">
-    <form id="enrollForm" class="form-horizontal" method="post" action="${basePath}admin/certMgr/initAdminCert.do">
-        <input type="hidden" name="subjectDn" value=""/>
+    <form id="enrollForm" class="form-horizontal" method="post" action="${basePath}offlineCa/uploadP7.do"
+          enctype="multipart/form-data">
         <div class="form-group text-center">
             <p>
                 <small class="text-danger">${RequestParameters["errorMsg"]}</small>
             </p>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">组织(O)</label>
+            <label class="col-sm-4">P7证书链:</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" name="o" value="${RequestParameters['o']}"/>
+                <input type="file" buttonText="选择文件" style="width:300px"
+                       accept="application/x-pkcs7-certificates" name="p7File"/>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">组织单位(OU)</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" name="ou" value="${RequestParameters['ou']}"/>
+            <div class="alert alert-danger" role="alert">
+                <h4>
+                    <small>上传注意:</small>
+                </h4>
+                <ol style="margin-left:30px;">
+                    <li>必须是PKCS7格式文件</li>
+                    <li>必须是完整证书链</li>
+                    <li>上传前请先正确配置JKS文件</li>
+                    <li>证书系统中不存在</li>
+                </ol>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">姓名(CN)</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" name="cn" value="${RequestParameters['cn']}"/>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-4">选择密钥对</label>
-            <div class="col-sm-8">
-                <select name="aliase" class="form-control">
-                    <#list keys as key>
-                        <option value="${key}">${key}</option>
-                    </#list>
-                </select>
-            </div>
-        </div>
-        <div class="form-group text-center">
-            <input type="submit" class="btn-info" value="提交"/>
+            <button type="submit" class="btn btn-info">上传</button>
         </div>
     </form>
 </div>

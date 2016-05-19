@@ -15,6 +15,7 @@ import org.ligson.fw.web.controller.BaseController;
 import org.ligson.fw.web.vo.WebResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -133,7 +134,7 @@ public class OfflineCaController extends BaseController {
     }
 
     @RequestMapping("/uploadP7.do")
-    public String uploadP7(CommonsMultipartFile p7File) {
+    public String uploadP7(@RequestParam CommonsMultipartFile p7File) {
         UploadP7CertChainRequestDto requestDto = new UploadP7CertChainRequestDto();
         requestDto.setP7File(p7File.getFileItem().get());
         Result<UploadP7CertChainResponseDto> uploadResult = offlineCaApi.uploadP7CertChain(requestDto);

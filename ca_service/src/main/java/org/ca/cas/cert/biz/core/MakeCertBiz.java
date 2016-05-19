@@ -139,8 +139,12 @@ public class MakeCertBiz {
     }
 
     public CertPath recoverCertPath(String certPathBuf) {
+        return recoverCertPath(Base64.decodeBase64(certPathBuf));
+    }
+
+    public CertPath recoverCertPath(byte[] certPathBuf) {
         try {
-            return certificateFactory.generateCertPath(new ByteArrayInputStream(certPathBuf.getBytes()));
+            return certificateFactory.generateCertPath(new ByteArrayInputStream(certPathBuf), "PKCS7");
         } catch (CertificateException e) {
             e.printStackTrace();
             logger.error("证书链还原失败!{}", e.getMessage());

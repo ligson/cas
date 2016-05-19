@@ -7,6 +7,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.ca.cas.cert.biz.GenCsrBiz;
 import org.ca.cas.cert.biz.core.CsrBiz;
+import org.ca.cas.cert.biz.core.MakeCertBiz;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
@@ -34,7 +35,6 @@ import java.util.*;
 @Component("uploadP7CertChainBiz")
 @Api(name = "上传P7 CA证书链接口")
 public class UploadP7CertChainBiz extends AbstractBiz<UploadP7CertChainRequestDto, UploadP7CertChainResponseDto> {
-    private static CertificateFactory certificateFactory;
 
     @Resource
     private OfflineCertService offlineCertService;
@@ -44,14 +44,11 @@ public class UploadP7CertChainBiz extends AbstractBiz<UploadP7CertChainRequestDt
     private KeyContainerBiz keyContainerBiz;
     @Resource
     private CsrBiz csrBiz;
+    @Resource
+    private MakeCertBiz makeCertBiz;
 
     @Override
     public void before() {
-        try {
-            certificateFactory = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -61,11 +58,8 @@ public class UploadP7CertChainBiz extends AbstractBiz<UploadP7CertChainRequestDt
 
     @Override
     public Boolean bizCheck() {
-        CertPath certPath;
-        try {
-            certPath = certificateFactory.generateCertPath(new ByteArrayInputStream(requestDto.getP7File()));
-        } catch (CertificateException e) {
-            e.printStackTrace();
+        CertPath certPath = makeCertBiz.recoverCertPath(Base64.decodeBase64(requestDto.getP7File()));
+        if (certPath == null) {
             setFailureResult(CertFailEnum.E_BIZ_21018);
             return false;
         }

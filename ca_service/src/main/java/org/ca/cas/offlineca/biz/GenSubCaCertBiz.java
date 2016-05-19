@@ -21,18 +21,14 @@ import org.ca.cas.offlineca.service.OfflineCertService;
 import org.ligson.fw.core.common.biz.AbstractBiz;
 import org.ligson.fw.core.common.utils.IdUtils;
 import org.ligson.fw.core.facade.annotation.Api;
-import org.ligson.fw.string.encode.HashHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
-import java.security.cert.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,16 +49,9 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
     @Resource
     private MakeCertBiz makeCertBiz;
 
-    private static CertificateFactory certificateFactory;
-
 
     @Override
     public void before() {
-        try {
-            certificateFactory = CertificateFactory.getInstance("X509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -122,11 +111,8 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         String subjectHash = context.getAttr("subjectHash", String.class);
         OfflineCertEntity issuerCert = context.getAttr("issueCert", OfflineCertEntity.class);
         PKCS10CertificationRequest certificationRequest = context.getAttr("csr", PKCS10CertificationRequest.class);
-        X509Certificate issuerCertObj;
-        try {
-            issuerCertObj = (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issuerCert.getCertBuf())));
-        } catch (CertificateException e) {
-            e.printStackTrace();
+        X509Certificate issuerCertObj = makeCertBiz.recoverCert(issuerCert.getCertBuf());
+        if (issuerCertObj == null) {
             setFailureResult(CertFailEnum.E_BIZ_21005);
             return false;
         }
@@ -190,12 +176,11 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         x509Certs.add(cert);
         OfflineCertEntity tmpEntity = offlineCertService.findBy("subjectDnHashMd5", issuerHashMd5);
         while (tmpEntity != null) {
-            try {
-                x509Certs.add(certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(tmpEntity.getCertBuf()))));
-            } catch (Exception e) {
-                e.printStackTrace();
+            X509Certificate x509Certificate = makeCertBiz.recoverCert(tmpEntity.getCertBuf());
+            if (x509Certificate == null) {
                 return null;
             }
+            x509Certs.add(x509Certificate);
             if (tmpEntity.getSubjectDnHashMd5().equals(tmpEntity.getIssuerDnHashMd5())) {
                 break;
             }
