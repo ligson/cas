@@ -124,7 +124,7 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         PKCS10CertificationRequest certificationRequest = context.getAttr("csr", PKCS10CertificationRequest.class);
         X509Certificate issuerCertObj;
         try {
-            issuerCertObj = (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issuerCert.getSignBuf())));
+            issuerCertObj = (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issuerCert.getCertBuf())));
         } catch (CertificateException e) {
             e.printStackTrace();
             setFailureResult(CertFailEnum.E_BIZ_21005);
@@ -164,8 +164,8 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         OfflineCertEntity offlineCertEntity = new OfflineCertEntity();
         offlineCertEntity.setReqBufType(1);
         offlineCertEntity.setReqBuf(Base64.encodeBase64String(certificationRequest.getEncoded()));
-        offlineCertEntity.setIssuerDn(issuerCert.getSubjectDnHashMd5());
-        offlineCertEntity.setSubjectDn(subjectHash);
+        offlineCertEntity.setIssuerDn(issuerCert.getSubjectDn());
+        offlineCertEntity.setSubjectDn(certificationRequest.getCertificationRequestInfo().getSubject().toString());
         offlineCertEntity.setIssuerDnHashMd5(issuerCert.getSubjectDnHashMd5());
         offlineCertEntity.setSubjectDnHashMd5(subjectHash);
         offlineCertEntity.setNotAfter(notAfter);
@@ -191,7 +191,7 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         OfflineCertEntity tmpEntity = offlineCertService.findBy("subjectDnHashMd5", issuerHashMd5);
         while (tmpEntity != null) {
             try {
-                x509Certs.add(certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(tmpEntity.getSignBuf()))));
+                x509Certs.add(certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(tmpEntity.getCertBuf()))));
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;

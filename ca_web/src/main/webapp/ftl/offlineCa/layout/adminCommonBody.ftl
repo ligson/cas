@@ -17,6 +17,7 @@
                     </div>
                 </td>
                 <td style="padding-right:5px;text-align:right;vertical-align:bottom;">
+                <#--
                     <div id="topmenu">
                         <a href="${basePath}admin/certMgr/index.html">证书管理</a>
                         <a href="/questionMgr/index">问题管理</a>
@@ -24,6 +25,7 @@
                         <a href="/payMgr/index">支付管理</a>
                         <a href="/systemMgr/index">系统管理</a>
                     </div>
+-->
 
                 </td>
                 <td style="padding-right:5px;text-align:right;vertical-align:bottom;">
