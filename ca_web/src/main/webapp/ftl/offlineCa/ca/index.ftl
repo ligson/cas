@@ -37,5 +37,30 @@
 <div class="easyui-dialog" style="width:500px;" id="viewCsrDlg" closed="true" title="查看CSR">
     <textarea class="form-control" rows="15" id="csr" disabled="disabled"></textarea>
 </div>
+<div id="downloadP12Btns">
+    <a class="easyui-linkbutton" onclick="$('#downloadP12Form').form('submit')">下载</a>
+    <a class="easyui-linkbutton" onclick="$('#downloadP12Dlg').dialog('close')">取消</a>
+</div>
+<div buttons="#downloadP12Btns" class="easyui-dialog" style="width:400px;" id="downloadP12Dlg" closed="true"
+     title="下载交换密钥文件">
+    <form style="width:350px;" class="form-horizontal" method="post" id="downloadP12Form"
+          action="${basePath}offlineCa/downloadP12.do">
+        <input type="hidden" name="certId" value=""/>
+        <div class="form-group">
+            <label class="col-sm-4">保护密码：</label>
+            <div class="col-sm-8">
+                <input id="pwd" type="password" required="true" class="form-control easyui-textbox" name="pwd"
+                       value=""/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4">再次输入保护密码：</label>
+            <div class="col-sm-8">
+                <input type="password" validType="equalTo['#pwd']" required="true" class="form-control easyui-textbox"
+                       name="retryPwd" value=""/>
+            </div>
+        </div>
+    </form>
+</div>
 </@override>
 <@extends name="offlineCa/layout/certMgr.ftl"/>

@@ -86,11 +86,11 @@ public class GenSelfCACertBiz extends AbstractBiz<GenSelfCertRequestDto, GenSelf
         KeyPairContainer container = context.getAttr("keyContainer", KeyPairContainer.class);
         X500Name subject = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
         String serialNum = IdUtils.randomIntString();
-        Date notAfter = new Date();
+        Date notBefore = new Date();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(notAfter);
+        calendar.setTime(notBefore);
         calendar.add(Calendar.YEAR, 1);
-        Date notBefore = calendar.getTime();
+        Date notAfter = calendar.getTime();
         List<Extension> extensions = new ArrayList<>();
         Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, false, new BasicConstraints(4));
         extensions.add(extension);

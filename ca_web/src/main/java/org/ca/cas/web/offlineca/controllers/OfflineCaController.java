@@ -1,5 +1,6 @@
 package org.ca.cas.web.offlineca.controllers;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.api.CertApi;
 import org.ca.cas.cert.dto.ListKeyStoreRequestDto;
 import org.ca.cas.cert.dto.ListKeyStoreResponseDto;
@@ -163,4 +164,43 @@ public class OfflineCaController extends BaseController {
         response.setContentType("text/html");
         response.getWriter().println("证书下载失败:" + queryResult.getFailureMessage());
     }
+
+    @RequestMapping("/downloadChain.do")
+    public void downloadChain(String certId) throws IOException {
+        OfflineCaCertQueryRequestDto requestDto = new OfflineCaCertQueryRequestDto();
+        requestDto.setPageAble(false);
+        requestDto.setId(certId);
+        Result<OfflineCaCertQueryResponseDto> queryResult = offlineCaApi.offlineCaCertQuery(requestDto);
+        if (queryResult.isSuccess()) {
+            if (queryResult.getData().getSuccess()) {
+                OfflineCaCert cert = queryResult.getData().getOfflineCaCert();
+                response.setContentType("application/x-pkcs7-certificates");
+                response.setHeader("Content-Disposition", "attachment;fileName=" + cert.getSerialNumber() + ".p7b");
+                response.getWriter().print(cert.getCertChainBuf());
+                return;
+                //application/x-x509-ca-cert
+            }
+        }
+        response.setContentType("text/html");
+        response.getWriter().println("证书下载失败:" + queryResult.getFailureMessage());
+    }
+
+    @RequestMapping("/downloadP12.do")
+    public void downloadP12(DownloadP12CaCertRequestDto requestDto) throws IOException {
+        Result<DownloadP12CaCertResponseDto> downloadResult = offlineCaApi.downloadP12CaCert(requestDto);
+        if (downloadResult.isSuccess()) {
+            if (downloadResult.getData().getSuccess()) {
+                String p12 = downloadResult.getData().getP12();
+                response.setContentType("application/x-pkcs12");
+                response.setHeader("Content-Disposition", "attachment;fileName=" + requestDto.getCertId() + ".pfx");
+                response.getOutputStream().write(Base64.decodeBase64(p12));
+                return;
+                //application/x-x509-ca-cert
+            }
+        }
+        response.setContentType("text/html");
+        response.getWriter().println("证书下载失败:" + downloadResult.getFailureMessage());
+    }
+
+
 }

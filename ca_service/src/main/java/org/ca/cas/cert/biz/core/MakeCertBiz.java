@@ -1,5 +1,6 @@
 package org.ca.cas.cert.biz.core;
 
+import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -10,17 +11,20 @@ import org.bouncycastle.cert.X509v1CertificateBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.ca.cas.cert.biz.core.model.Extension;
+import org.ca.cas.common.biz.KeyContainerBiz;
+import org.ca.cas.common.model.KeyPairContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigInteger;
+import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
+import java.security.cert.*;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +36,22 @@ public class MakeCertBiz {
 
     @Resource
     private SignBiz signBiz;
+    @Resource
+    private KeyContainerBiz keyContainerBiz;
+
+    private static CertificateFactory certificateFactory;
+
+    private static Logger logger = LoggerFactory.getLogger(MakeCertBiz.class);
+
+    @PostConstruct
+    public void init() {
+        try {
+            certificateFactory = CertificateFactory.getInstance("X509");
+        } catch (CertificateException e) {
+            e.printStackTrace();
+            logger.info("x509证书初始化失败!");
+        }
+    }
 
     private X509Certificate gen(String version, SubjectPublicKeyInfo
             subjectPublicKeyInfo, PrivateKey privateKey, X500Name issuer, X500Name subject, BigInteger serial, Date notBefore, Date notAfter, List<Extension> extensionList) {
@@ -86,5 +106,45 @@ public class MakeCertBiz {
         SubjectPublicKeyInfo subjectPublicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
         return genV3(subjectPublicKeyInfo, privateKey, issuer, subject,
                 serial, notBefore, notAfter, extensionList);
+    }
+
+    public String genPkcs12(Certificate certificate, String pwd) {
+        KeyPairContainer container = keyContainerBiz.getKeyPair(certificate.getPublicKey());
+        if (container == null) {
+            return null;
+        }
+        KeyStore keyStore = null;
+        try {
+            keyStore = KeyStore.getInstance("PKCS12");
+            keyStore.load(null, null);
+            keyStore.setKeyEntry("user", container.getPrivateKey(), pwd.toCharArray(), new Certificate[]{certificate});
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            keyStore.store(byteArrayOutputStream, pwd.toCharArray());
+            return Base64.encodeBase64String(byteArrayOutputStream.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public X509Certificate recoverCert(String certBuf) {
+        try {
+            Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(certBuf)));
+            return (X509Certificate) certificate;
+        } catch (CertificateException e) {
+            e.printStackTrace();
+            logger.error("证书还原失败!{}", e.getMessage());
+            return null;
+        }
+    }
+
+    public CertPath recoverCertPath(String certPathBuf) {
+        try {
+            return certificateFactory.generateCertPath(new ByteArrayInputStream(certPathBuf.getBytes()));
+        } catch (CertificateException e) {
+            e.printStackTrace();
+            logger.error("证书链还原失败!{}", e.getMessage());
+            return null;
+        }
     }
 }

@@ -16,4 +16,6 @@ public interface OfflineCaApi {
     Result<OfflineCaCertQueryResponseDto> offlineCaCertQuery(OfflineCaCertQueryRequestDto requestDto);
 
     Result<UploadP7CertChainResponseDto> uploadP7CertChain(UploadP7CertChainRequestDto requestDto);
+
+    Result<DownloadP12CaCertResponseDto> downloadP12CaCert(DownloadP12CaCertRequestDto request);
 }

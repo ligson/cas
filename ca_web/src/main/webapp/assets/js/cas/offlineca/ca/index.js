@@ -53,6 +53,16 @@ $(function () {
             }
             },
             {
+                field: "downloadCertChain", title: "证书链信息", formatter: function (value, row, idx) {
+                return "<a href='/ca/offlineCa/downloadChain.do?certId=" + row.id + "'>查看</a>";
+            }
+            },
+            {
+                field: "exportPrivateOpt", title: "导出私钥", formatter: function (value, row, idx) {
+                return "<a onclick='exportPrivate(\"" + row.id + "\")'>导出</a>";
+            }
+            },
+            {
                 field: "createSubCAOpt", title: "创建下级证书", formatter: function (value, row) {
                 return "<a href='/ca/offlineCa/createSubCert.html?issueCertId=" + row.id + "'>创建</a>";
             }
@@ -109,4 +119,10 @@ function viewCsr(idx) {
     var rows = userGrid.datagrid("getRows");
     $("#csr").empty().append(rows[idx].reqBuf);
     $("#viewCsrDlg").dialog("open");
+}
+
+function exportPrivate(certId) {
+    var dlg = $("#downloadP12Dlg");
+    dlg.find("input[name='certId']").val(certId);
+    dlg.dialog("open");
 }

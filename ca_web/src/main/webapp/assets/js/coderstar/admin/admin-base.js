@@ -43,6 +43,13 @@ $(function () {
                 return reg.test(value);
             },
             message: "请输入正确的手机号"
+        },
+        /*必须和某个字段相等*/
+        equalTo: {
+            validator: function (value, param) {
+                return $(param[0]).val() == value;
+            },
+            message: '字段不匹配'
         }
     });
 

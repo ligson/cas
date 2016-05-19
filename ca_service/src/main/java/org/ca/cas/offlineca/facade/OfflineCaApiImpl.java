@@ -24,6 +24,8 @@ public class OfflineCaApiImpl implements OfflineCaApi {
     private OfflineCaCertQueryBiz offlineCaCertQueryBiz;
     @Resource
     private UploadP7CertChainBiz uploadP7CertChainBiz;
+    @Resource
+    private DownloadP12OfflineCertBiz downloadP12OfflineCertBiz;
 
     @Override
     public Result<GenCaCsrResponseDto> genCaCsr(GenCaCsrRequestDto requestDto) {
@@ -48,5 +50,10 @@ public class OfflineCaApiImpl implements OfflineCaApi {
     @Override
     public Result<UploadP7CertChainResponseDto> uploadP7CertChain(UploadP7CertChainRequestDto requestDto) {
         return uploadP7CertChainBiz.operation(requestDto);
+    }
+
+    @Override
+    public Result<DownloadP12CaCertResponseDto> downloadP12CaCert(DownloadP12CaCertRequestDto request) {
+        return downloadP12OfflineCertBiz.operation(request);
     }
 }
