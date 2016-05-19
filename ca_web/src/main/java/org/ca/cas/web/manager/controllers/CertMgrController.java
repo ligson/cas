@@ -251,6 +251,7 @@ public class CertMgrController extends BaseController {
             try {
                 response.setHeader("Content-Disposition", "attachment;filename=\"" + java.net.URLEncoder.encode(sdf.format(new Date()) + ".crl", "UTF-8") + "\"");
                 response.getOutputStream().write(crlBuf);
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
                 return;

@@ -57,7 +57,7 @@ public class RevokeCertBiz extends AbstractBiz<RevokeCertRequestDto, RevokeCertR
         CertEntity entity = (CertEntity) context.getAttr("entity");
         CertRevokeEntity revokeEntity = new CertRevokeEntity();
         revokeEntity.setCertId(requestDto.getCertId());
-        revokeEntity.setAdminId(revokeEntity.getAdminId());
+        revokeEntity.setAdminId(requestDto.getAdminId());
         revokeEntity.setCertIssuerHashMd5(entity.getIssuerDnHashMd5());
         revokeEntity.setCertRevokeDate(new Date());
         revokeEntity.setCertNotAfter(entity.getNotAfter());

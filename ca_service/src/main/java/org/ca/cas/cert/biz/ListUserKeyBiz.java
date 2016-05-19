@@ -1,4 +1,4 @@
-package org.ca.cas.cert;
+package org.ca.cas.cert.biz;
 
 import org.ca.cas.cert.dto.ListUserKeyRequestDto;
 import org.ca.cas.cert.dto.ListUserKeyResponseDto;

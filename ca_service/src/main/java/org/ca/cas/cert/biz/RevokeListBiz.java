@@ -70,8 +70,8 @@ public class RevokeListBiz extends AbstractBiz<RevokeListRequestDto, RevokeListR
             CertEntity certEntity = certService.get(entity1.getCertId());
             revokeCert.setCertSubjectDn(certEntity.getSubjectDn());
             revokeCert.setCertIssueDn(certEntity.getIssuerDn());
-            if (entity.getAdminId() != null) {
-                UserEntity userEntity = userService.get(entity.getAdminId());
+            if (entity1.getAdminId() != null) {
+                UserEntity userEntity = userService.get(entity1.getAdminId());
                 revokeCert.setAdminName(userEntity.getName());
             }
             revokeCerts.add(revokeCert);

@@ -70,7 +70,7 @@ public class MakeCrlBiz {
         v2CrlGen.setExtensions(x509extensions);
         //println(crlInfo.signAlg);
         AlgorithmIdentifier algSign;
-        byte[] caCertByte = org.apache.commons.codec.binary.Base64.decodeBase64(issuer.getReqBuf());
+        byte[] caCertByte = org.apache.commons.codec.binary.Base64.decodeBase64(issuer.getSignBuf());
         Certificate caCert = null;
         try {
             caCert = certificateFactory.generateCertificate(new ByteArrayInputStream(caCertByte));

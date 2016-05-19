@@ -34,8 +34,23 @@ $(function () {
             },
             {
                 field: 'revokeReason', title: '吊销原因', width: 100, sortable: true, formatter: function (value) {
-                if (value != null) {
-                    return new Date(value).format("yyyy-MM-dd HH:mm:ss");
+                if (value == 1) {
+                    return "unused(未知)";
+                } else if (value == 2) {
+                    return "keyCompromise(密钥遭受损害)";
+                } else if (value == 3) {
+                    //caCompromise(3, "CA 遭受损害"),
+                    return "caCompromise(CA 遭受损害)";
+                } else if (value == 4) {
+                    return "affiliationChanged(从属关系变动)";
+                } else if (value == 5) {
+                    return "superseded(证书被替代)";
+                } else if (value == 6) {
+                    return "cessationOfOperation(停止使用)";
+                } else if (value == 7) {
+                    return "certificateHold(证书暂停使用)";
+                } else {
+                    return value;
                 }
             }
             },
@@ -70,7 +85,7 @@ $(function () {
                 text: "下载CRL",
                 iconCls: 'icon-save',
                 handler: function () {
-                    window.location.href = baseUrl + "ca/certMgr/downloadCrl.do";
+                    window.location.href = baseUrl + "ca/admin/certMgr/downloadCrl.do";
                 }
             }
         ]

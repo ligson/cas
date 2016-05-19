@@ -6,10 +6,13 @@ import org.ca.cas.cert.dto.DownloadCrlResponseDto;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.BaseCrlService;
 import org.ligson.fw.core.common.biz.AbstractBiz;
+import org.ligson.fw.core.entity.Pagination;
 import org.ligson.fw.core.facade.annotation.Api;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Created by ligson on 2016/5/17.
@@ -32,11 +35,17 @@ public class DownloadCrlBiz extends AbstractBiz<DownloadCrlRequestDto, DownloadC
 
     @Override
     public Boolean bizCheck() {
-        BaseCrlEntity baseCrlEntity = baseCrlService.findBy("certSerialNumber", requestDto.getCaCertSerialNumber());
-        if (baseCrlEntity == null) {
+        BaseCrlEntity crlEntity = new BaseCrlEntity();
+        crlEntity.setCertSerialNumber(requestDto.getCaCertSerialNumber());
+        crlEntity.setSort("lastUpdate");
+        crlEntity.setOrder("desc");
+        Pagination<BaseCrlEntity> page = baseCrlService.findAllByEqAnd(crlEntity);
+        List<BaseCrlEntity> crlEntities = page.getDatas();
+        if (CollectionUtils.isEmpty(crlEntities)) {
             setFailureResult(CertFailEnum.E_BIZ_21013);
             return false;
         }
+        BaseCrlEntity baseCrlEntity = crlEntities.get(0);
         responseDto.setCrl(baseCrlEntity.getCrlBuf());
         setSuccessResult();
         return true;

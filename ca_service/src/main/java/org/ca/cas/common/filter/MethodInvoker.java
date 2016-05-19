@@ -51,12 +51,12 @@ public class MethodInvoker implements MethodInterceptor {
                         result = Result.getFailureResult(FailureCodeEnum.SERVICE_EXCEPTION.getCode(),
                                 FailureCodeEnum.SERVICE_EXCEPTION.getMsg() + ";异常信息:" + e);
                         //事物回滚
-                        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                        //TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     } finally {
                         long end = System.currentTimeMillis();
                         logger.debug("{}调用完成:{}【{}】，耗时{}ms", PERFIX, api.name(), bizClass.getName(), end - start);
                         logger.debug("/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=");
-                        dataSource.getConnection().close();
+                        //dataSource.getConnection().close();
                     }
                     return result;
                 }

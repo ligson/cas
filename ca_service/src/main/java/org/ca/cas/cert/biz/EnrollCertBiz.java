@@ -30,7 +30,10 @@ import org.ligson.fw.string.encode.HashHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.*;
@@ -144,12 +147,13 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         PrivateKey issuePrivateKey;
         PublicKey userPublicKey;
         X500Name subjectDn;
+        KeyPairContainer caContainer;
         if (context.getAttr("isRootCert") != null) {
             //issue root cert
-            KeyPairContainer keyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
-            issuePublicKey = keyPairContainer.getPublicKey();
-            issuePrivateKey = keyPairContainer.getPrivateKey();
-            userPublicKey = keyPairContainer.getPublicKey();
+            caContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
+            issuePublicKey = caContainer.getPublicKey();
+            issuePrivateKey = caContainer.getPrivateKey();
+            userPublicKey = caContainer.getPublicKey();
             subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
         } else {
             CertEntity issueCert = (CertEntity) context.getAttr("issueCert");
@@ -161,9 +165,9 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 certService.delete(entity);
                 return false;
             }
-            KeyPairContainer issueContainer = keyContainerBiz.getKeyPair(certificate.getPublicKey());
-            issuePublicKey = issueContainer.getPublicKey();
-            issuePrivateKey = issueContainer.getPrivateKey();
+            caContainer = keyContainerBiz.getKeyPair(certificate.getPublicKey());
+            issuePublicKey = caContainer.getPublicKey();
+            issuePrivateKey = caContainer.getPrivateKey();
             if (requestDto.getKeyId() != null) {
                 KeyPairContainer userkeyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
                 userPublicKey = userkeyPairContainer.getPublicKey();
@@ -227,6 +231,13 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 entity.setSerialNumber(entity.getId());
                 entity.setCertPin(requestDto.getCertPin());
                 entity.setSignBufP7(Base64.encodeBase64String(certChainBuf));
+                if (requestDto.getCsr() == null && caContainer != null) {
+                    PKCS10CertificationRequest pkcs10 = genCsr(caContainer, X500NameUtils.subjectToX500Name(requestDto.getSubjectDn()));
+                    if (pkcs10 != null) {
+                        entity.setReqBuf(Base64.encodeBase64String(pkcs10.getEncoded()));
+                        entity.setReqBufType(1);
+                    }
+                }
             } else {
                 setFailureResult(CertFailEnum.E_BIZ_21004);
                 certService.delete(entity);
@@ -237,6 +248,18 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
 
         context.setAttr("entity", entity);
         return true;
+    }
+
+    public static PKCS10CertificationRequest genCsr(KeyPairContainer keyPair, X500Name subject) {
+        try {
+            //生成csr
+            X500Principal principal = new X500Principal(subject.getEncoded());
+            PKCS10CertificationRequest request = new PKCS10CertificationRequest("SHA1withRSA", principal, keyPair.getPublicKey(), null, keyPair.getPrivateKey());
+            return request;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private byte[] getCertChain(CertEntity certEntity, byte[] certBuf) {

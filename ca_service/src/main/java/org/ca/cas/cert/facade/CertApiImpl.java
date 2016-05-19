@@ -1,6 +1,6 @@
 package org.ca.cas.cert.facade;
 
-import org.ca.cas.cert.ListUserKeyBiz;
+import org.ca.cas.cert.biz.ListUserKeyBiz;
 import org.ca.cas.cert.api.CertApi;
 import org.ca.cas.cert.biz.*;
 import org.ca.cas.cert.dto.*;

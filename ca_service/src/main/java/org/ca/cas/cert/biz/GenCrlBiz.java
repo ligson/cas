@@ -76,8 +76,8 @@ public class GenCrlBiz extends AbstractBiz<GenCrlRequestDto, GenCrlResponseDto> 
         revokeEntity.setPageAble(false);
         Pagination<CertRevokeEntity> pagination = certRevokeService.findAllByEqAnd(revokeEntity);
         List<CertRevokeEntity> entities = pagination.getDatas();
-        List<CertRevokeEntity> revokeEntities = new ArrayList<>();
-        if (baseCrlEntity != null) {
+        List<CertRevokeEntity> revokeEntities = entities;
+        /*if (baseCrlEntity != null) {
             boolean start = false;
             for (CertRevokeEntity certRevokeEntity : entities) {
                 if (start) {
@@ -89,7 +89,7 @@ public class GenCrlBiz extends AbstractBiz<GenCrlRequestDto, GenCrlResponseDto> 
             }
         } else {
             revokeEntities = entities;
-        }
+        }*/
         if (revokeEntities.size() == 0) {
             setFailureResult(CertFailEnum.E_BIZ_21012);
             return false;
