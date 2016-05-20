@@ -203,5 +203,17 @@ public class OfflineCaController extends BaseController {
         response.getWriter().println("证书下载失败:" + downloadResult.getFailureMessage());
     }
 
+    @ResponseBody
+    @RequestMapping("/deleteOfflineCert.json")
+    public WebResult deleteOfflineCert(DeleteOfflineCertRequestDto requestDto) {
+        Result<DeleteOfflineCertResponseDto> deleteResult = offlineCaApi.deleteOfflineCert(requestDto);
+        if (deleteResult.isSuccess()) {
+            webResult.setSuccess(true);
+        } else {
+            webResult.setError(deleteResult);
+        }
+        return webResult;
+    }
+
 
 }

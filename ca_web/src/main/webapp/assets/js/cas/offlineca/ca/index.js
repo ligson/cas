@@ -76,9 +76,56 @@ $(function () {
             handler: function () {
                 showRevokeDlg();
             }
+        }, {
+            id: 'delBtn',
+            text: '删除',
+            iconCls: 'icon-ok',
+            handler: function () {
+                delOfflineCert();
+            }
         }]
     });
 });
+function delOfflineCert() {
+    var userGrid = $("#tt");
+    var rows = userGrid.datagrid("getSelections");
+    if (rows.length == 0) {
+        alert("请选择要删除的证书");
+        return;
+    }
+    var certIds = "";
+    for (var i = 0; i < rows.length; i++) {
+        if (i != rows.length - 1) {
+            certIds += rows[i].id + ",";
+        } else {
+            certIds += rows[i].id;
+        }
+    }
+    $.messager.confirm("确认", "确定要删除选中的证书吗?", function (data) {
+        if (data) {
+            var isBreak = false;
+            for (var i = 0; i < rows.length; i++) {
+                $.ajax({
+                    url: baseUrl + "ca/offlineCa/deleteOfflineCert.json",
+                    dataType: "json",
+                    data: {id: rows[i].id},
+                    async: false,
+                    type: "POST",
+                    success: function (data) {
+                        if (!data.success) {
+                            alert("删除证书[" + rows[i].subjectDn + "]失败!");
+                            isBreak = true;
+                        }
+                    }
+                });
+                if (isBreak) {
+                    break;
+                }
+            }
+            userGrid.datagrid("reload");
+        }
+    });
+}
 function showRevokeDlg() {
     var userGrid = $("#tt");
     var rows = userGrid.datagrid("getSelections");
