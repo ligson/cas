@@ -379,4 +379,11 @@ public class OfflineCaController extends BaseController {
     }
 
 
+    @RequestMapping("/logout.do")
+    public String logout() {
+        session.invalidate();
+        return redirect("/offlineCa/login.html");
+    }
+
+
 }
