@@ -31,6 +31,11 @@
     <dubbo:service interface="org.ca.cas.offlineca.api.OfflineCaApi" ref="offlineCaApi"
                    version="${dubbo.iterface.version}"/>
     <bean id="offlineCaApi" class="org.ca.cas.offlineca.facade.OfflineCaApiImpl"/>
+
+    <dubbo:service interface="org.ca.cas.offlineca.api.OfflineAdminApi" ref="offlineAdminApi"
+                   version="${dubbo.iterface.version}"/>
+    <bean id="offlineAdminApi" class="org.ca.cas.offlineca.facade.OfflineAdminApiImpl"/>
+
 </beans>
 
 

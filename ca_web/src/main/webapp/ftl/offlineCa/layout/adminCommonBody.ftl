@@ -34,7 +34,7 @@
                                   id="login_username"
                                   href="${basePath}admin/userMgr/view.html?userId=">11111</a>&nbsp;&nbsp;
                             <a style="color:#FFF" class="easyui-linkbutton" iconCls="icon-control_power_blue"
-                               plain="true" href="${basePath}admin/logout.do">退出</a></p>
+                               plain="true" href="${basePath}offlineCa/logout.do">安全退出</a></p>
                     </div>
                 </td>
             </tr>

@@ -7,12 +7,17 @@ import org.ca.cas.cert.dto.ListKeyStoreResponseDto;
 import org.ca.cas.cert.dto.QueryCertRequestDto;
 import org.ca.cas.cert.dto.QueryCertResponseDto;
 import org.ca.cas.cert.vo.Cert;
+import org.ca.cas.offlineca.api.OfflineAdminApi;
 import org.ca.cas.offlineca.api.OfflineCaApi;
 import org.ca.cas.offlineca.dto.*;
+import org.ca.cas.offlineca.vo.OfflineAdmin;
 import org.ca.cas.offlineca.vo.OfflineCaCert;
+import org.ca.common.user.enums.UserState;
 import org.ligson.fw.core.facade.base.result.Result;
+import org.ligson.fw.string.encode.HashHelper;
 import org.ligson.fw.web.controller.BaseController;
 import org.ligson.fw.web.vo.WebResult;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +26,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ligson on 2016/5/19.
@@ -32,6 +39,11 @@ public class OfflineCaController extends BaseController {
     private OfflineCaApi offlineCaApi;
     @Resource
     private CertApi certApi;
+    @Resource
+    private OfflineAdminApi offlineAdminApi;
+
+    @Value("#{caConfig['minLoginAdminCount']}")
+    private int MIN_LOGIN_ADMIN_COUNT;
 
     @RequestMapping("/index.html")
     public String index() {
@@ -211,6 +223,157 @@ public class OfflineCaController extends BaseController {
             webResult.setSuccess(true);
         } else {
             webResult.setError(deleteResult);
+        }
+        return webResult;
+    }
+
+    @RequestMapping("/login.html")
+    public String toLogin() {
+        return "offlineCa/ca/login";
+    }
+
+    @RequestMapping("/login.do")
+    public String login(String name, String password) {
+        OfflineAdminQueryRequestDto requestDto = new OfflineAdminQueryRequestDto();
+        requestDto.setName(name);
+        requestDto.setPassword(HashHelper.md5(password));
+        requestDto.setPageAble(false);
+        Result<OfflineAdminQueryResponseDto> queryResult = offlineAdminApi.queryAdmin(requestDto);
+        if (queryResult.isSuccess() && queryResult.getData().getOfflineAdmin() != null) {
+            OfflineAdmin offlineAdmin = queryResult.getData().getOfflineAdmin();
+            if (offlineAdmin.getStatus() == UserState.DISABLED.getCode()) {
+                model.addAttribute("errorMsg", "管理员[" + offlineAdmin.getName() + "]状态无效");
+                return redirect("/offlineCa/login.html");
+            }
+            Object adminListObj = session.getAttribute("offlineAdminList");
+            if (adminListObj != null) {
+                List<OfflineAdmin> offlineAdminList = (List<OfflineAdmin>) adminListObj;
+                if (offlineAdminList.contains(offlineAdmin)) {
+                    model.addAttribute("errorMsg", "管理员[" + offlineAdmin.getName() + "]已经登陆");
+                    return redirect("/offlineCa/login.html");
+                } else {
+                    offlineAdminList.add(offlineAdmin);
+                    session.setAttribute("offlineAdminList", offlineAdminList);
+                    if (offlineAdminList.size() == MIN_LOGIN_ADMIN_COUNT) {
+                        return redirect("/offlineCa/index.html");
+                    } else {
+                        model.addAttribute("errorMsg", "请登录第" + (offlineAdminList.size() + 1) + "位管理员");
+                        return redirect("/offlineCa/login.html");
+                    }
+                }
+            } else {
+                List<OfflineAdmin> offlineAdminList = new ArrayList<>();
+                offlineAdminList.add(offlineAdmin);
+                session.setAttribute("offlineAdminList", offlineAdminList);
+                model.addAttribute("errorMsg", "请登录第" + (offlineAdminList.size() + 1) + "位管理员");
+                return redirect("/offlineCa/login.html");
+            }
+        } else {
+            model.addAttribute("errorMsg", "用户不存在或者密码错误");
+            return redirect("/offlineCa/login.html");
+        }
+    }
+
+    @RequestMapping("/register.html")
+    public String toRegister() {
+        return "offlineCa/ca/register";
+    }
+
+    @RequestMapping("/register.do")
+    public String register(OfflineAdminAddRequestDto requestDto) {
+        requestDto.setPassword(HashHelper.md5(requestDto.getPassword()));
+        Result<OfflineAdminAddResponseDto> addAdminResult = offlineAdminApi.addAdmin(requestDto);
+        if (addAdminResult.isSuccess()) {
+            Result<OfflineAdminQueryResponseDto> queryResult = offlineAdminApi.queryAdmin(new OfflineAdminQueryRequestDto());
+            if (queryResult.isSuccess()) {
+                int total = queryResult.getData().getTotalCount();
+                if (total < 6) {
+                    model.addAttribute("errorMsg", "请注册第" + (total + 1) + "位管理员");
+                    return redirect("/offlineCa/register.html");
+                } else {
+                    model.addAttribute("errorMsg", "请登录");
+                    return redirect("/offlineCa/login.html");
+                }
+            } else {
+                model.addAttribute("errorMsg", addAdminResult.getFailureMessage());
+                return redirect("/offlineCa/register.html");
+            }
+        } else {
+            model.addAttribute("errorMsg", addAdminResult.getFailureMessage());
+            return redirect("/offlineCa/register.html");
+        }
+    }
+
+    @RequestMapping("/userList.html")
+    public String toUserList() {
+        return "offlineCa/ca/userList";
+    }
+
+    @ResponseBody
+    @RequestMapping("/userList.json")
+    public WebResult userList(OfflineAdminQueryRequestDto requestDto) {
+        String pageString = request.getParameter("page");
+        int page = Integer.parseInt(pageString);
+        requestDto.setPageNum(page);
+        String rowString = request.getParameter("rows");
+        int rows = Integer.parseInt(rowString);
+        requestDto.setPageSize(rows);
+        Result<OfflineAdminQueryResponseDto> result = offlineAdminApi.queryAdmin(requestDto);
+        if (result.isSuccess()) {
+            webResult.put("total", result.getData().getTotalCount());
+            webResult.put("rows", result.getData().getOfflineAdminList());
+            webResult.setSuccess(true);
+        } else {
+            webResult.setError(result);
+        }
+        return webResult;
+    }
+
+    @RequestMapping("/modifyStatus.json")
+    @ResponseBody
+    public WebResult modifyStatus(String id, int status) {
+        OfflineAdminModifyRequestDto requestDto = new OfflineAdminModifyRequestDto();
+        requestDto.setId(id);
+        requestDto.setStatus(status);
+        Result<OfflineAdminModifyResponseDto> modifyResult = offlineAdminApi.modifyAdmin(requestDto);
+        if (modifyResult.isSuccess()) {
+            webResult.setSuccess(true);
+        } else {
+            webResult.setError(modifyResult);
+        }
+        return webResult;
+    }
+
+    @RequestMapping("/modifyPwd.html")
+    public String toModifyPwd() {
+        return "offlineCa/ca/modifyPwd";
+    }
+
+    @ResponseBody
+    @RequestMapping("/modifyPwd.json")
+    public WebResult modifyPwd(String id, String oldPwd, String newPwd) {
+        OfflineAdminQueryRequestDto queryRequestDto = new OfflineAdminQueryRequestDto();
+        queryRequestDto.setPageAble(false);
+        queryRequestDto.setId(id);
+        Result<OfflineAdminQueryResponseDto> queryResult = offlineAdminApi.queryAdmin(queryRequestDto);
+        if (queryResult.isSuccess()) {
+            OfflineAdmin offlineAdmin = queryResult.getData().getOfflineAdmin();
+            if (offlineAdmin.getPassword().equals(HashHelper.md5(oldPwd))) {
+                OfflineAdminModifyRequestDto modifyRequestDto = new OfflineAdminModifyRequestDto();
+                modifyRequestDto.setId(id);
+                modifyRequestDto.setPassword(HashHelper.md5(newPwd));
+                Result<OfflineAdminModifyResponseDto> modifyResult = offlineAdminApi.modifyAdmin(modifyRequestDto);
+                if (modifyResult.isSuccess()) {
+                    webResult.setSuccess(true);
+                } else {
+                    webResult.setError(modifyResult);
+                }
+            } else {
+                webResult.setSuccess(false);
+                webResult.setErrorMsg("旧密码不一致");
+            }
+        } else {
+            webResult.setError(queryResult);
         }
         return webResult;
     }

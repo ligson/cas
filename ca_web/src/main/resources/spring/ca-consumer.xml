@@ -31,5 +31,10 @@
                      interface="org.ca.cas.offlineca.api.OfflineCaApi"
                      timeout="${dubbo.ca.consumer.timeout}"
                      version="${dubbo.ca.iterface.version}"/>
+    <dubbo:reference id="offlineAdminApi"
+                     interface="org.ca.cas.offlineca.api.OfflineAdminApi"
+                     timeout="${dubbo.ca.consumer.timeout}"
+                     version="${dubbo.ca.iterface.version}"/>
+
 
 </beans>
