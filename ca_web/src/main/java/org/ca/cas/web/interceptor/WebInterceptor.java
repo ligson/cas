@@ -27,7 +27,7 @@ public class WebInterceptor implements HandlerInterceptor {
             String path = request.getServletPath();
             Object token = request.getSession().getAttribute("adminUser");
             if (token == null) {
-                response.sendRedirect("/admin/login.html");
+                response.sendRedirect(request.getContextPath() + "/admin/login.html");
                 return false;
             }
 
