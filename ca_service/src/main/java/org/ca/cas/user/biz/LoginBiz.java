@@ -1,5 +1,6 @@
 package org.ca.cas.user.biz;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.biz.core.MakeCertBiz;
 import org.ca.cas.cert.domain.CertEntity;
 import org.ca.cas.cert.enums.CertFailEnum;
@@ -21,6 +22,11 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
@@ -88,6 +94,20 @@ public class LoginBiz extends AbstractBiz<LoginRequestDto, LoginResponseDto> {
                 Date nowDate = new Date();
                 if (certEntity.getNotBefore().getTime() - nowDate.getTime() < 0) {
                     setFailureResult(CertFailEnum.E_BIZ_21020);
+                    return false;
+                }
+
+                String issuerDnHashMd5 = certEntity.getIssuerDnHashMd5();
+                CertEntity issuerCert = certService.findBy("subjectDnHashMd5", issuerDnHashMd5);
+                if (issuerCert == null) {
+                    setFailureResult(CertFailEnum.E_BIZ_21003);
+                    return false;
+                }
+                X509Certificate issuerCert509 = makeCertBiz.recoverCert(issuerCert.getSignBuf());
+                try {
+                    cert.verify(issuerCert509.getPublicKey());
+                } catch (Exception e) {
+                    setFailureResult(CertFailEnum.E_BIZ_21007);
                     return false;
                 }
 
