@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class Test {
     public static void main(String[] args) {
-        ApiCollection collection = new ApiCollection(CertApi.class);
+        ApiCollection collection = new ApiCollection(UserApi.class);
         System.out.println(collection.getClazz().getName());
         //System.out.println(collection);
         for (ApiModel apiModel : collection.getApiModelList()) {
