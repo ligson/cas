@@ -10,7 +10,7 @@ import org.ligson.fw.string.validator.PhoneValidator;
  * Created by ligson on 2016/4/26.
  */
 public class LoginRequestDto extends BaseRequestDto {
-    @Param(name = "登陆名", required = true)
+    @Param(name = "登陆名", required = false)
     private String loginName;
     @Param(name = "登陆名类型", required = true)
     private LoginNameType loginNameType;
