@@ -71,4 +71,7 @@ public interface OfflineCaApi {
      */
     @Api(name = "删除离线证书接口")
     Result<DeleteOfflineCertResponseDto> deleteOfflineCert(DeleteOfflineCertRequestDto requestDto);
+
+    @Api(name = "导出离线CA证书到jks文件接口")
+    Result<ExportCaCertJksResponseDto> exportCaCertJks(ExportCaCertJksRequestDto requestDto);
 }

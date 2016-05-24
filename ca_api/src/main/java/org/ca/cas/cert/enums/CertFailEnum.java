@@ -29,6 +29,8 @@ public class CertFailEnum extends FailureCodeEnum {
     public static final CertFailEnum E_BIZ_21018 = new CertFailEnum("E_BIZ_21018", "P7证书解码失败");
     public static final CertFailEnum E_BIZ_21019 = new CertFailEnum("E_BIZ_21019", "密钥交换格式文件生成失败");
     public static final CertFailEnum E_BIZ_21020 = new CertFailEnum("E_BIZ_21020", "证书已过期");
+    public static final CertFailEnum E_BIZ_21021 = new CertFailEnum("E_BIZ_21021", "证书ID列表为空");
+    public static final CertFailEnum E_BIZ_21022 = new CertFailEnum("E_BIZ_21022", "JKS文件导出失败");
 
 
     /**
