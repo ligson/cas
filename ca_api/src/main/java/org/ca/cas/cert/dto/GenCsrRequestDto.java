@@ -7,11 +7,11 @@ import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
  * Created by ligson on 2016/5/16.
  */
 public class GenCsrRequestDto extends BaseRequestDto {
-    @Param(name = "subjectDn", required = true)
+    @Param(name = "证书主题", required = true)
     private String subjectDn;
-    @Param(name = "aliase", required = true)
+    @Param(name = "密钥对id", required = true)
     private String aliase;
-    @Param(name = "adminId", required = true)
+    @Param(name = "管理员id", required = true)
     private String adminId;
 
 

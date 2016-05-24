@@ -1,5 +1,6 @@
 package org.ca.cas.offlineca.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
 
 /**
@@ -7,6 +8,7 @@ import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
  */
 public class UploadP7CertChainRequestDto extends BaseRequestDto {
 
+    @Param(name = "证书链文件", required = true)
     private byte[] p7File;
 
     public byte[] getP7File() {

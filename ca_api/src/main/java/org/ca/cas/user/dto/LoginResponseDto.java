@@ -1,12 +1,14 @@
 package org.ca.cas.user.dto;
 
 import org.ca.cas.user.vo.User;
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseResponseDto;
 
 /**
  * Created by ligson on 2016/4/26.
  */
 public class LoginResponseDto extends BaseResponseDto {
+    @Param(name = "用户信息")
     private User user;
 
     public User getUser() {

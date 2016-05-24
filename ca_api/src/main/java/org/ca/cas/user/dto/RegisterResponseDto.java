@@ -1,5 +1,6 @@
 package org.ca.cas.user.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseResponseDto;
 
 import java.math.BigInteger;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
  * @author ligson
  */
 public class RegisterResponseDto extends BaseResponseDto {
+    @Param(name = "用户Id")
     private String id;
 
     public String getId() {

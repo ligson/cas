@@ -13,22 +13,25 @@ public class ModifyUserRequestDto extends BaseRequestDto {
     /***
      * id
      */
-    @Param(name = "id", required = true)
+    @Param(name = "用户id", required = true)
     private String id;
 
     /***
      * 生日
      */
+    @Param(name = "生日")
     private Date birth;
 
     /***
      * 姓名
      */
+    @Param(name = "姓名")
     private String name;
 
     /***
      * 性别
      */
+    @Param(name = "性别")
     private Boolean sex;
 
     /***
@@ -36,6 +39,7 @@ public class ModifyUserRequestDto extends BaseRequestDto {
      *
      * @see org.ca.common.user.enums.UserState
      */
+    @Param(name = "状态")
     private Integer status;
 
     /***
@@ -53,6 +57,7 @@ public class ModifyUserRequestDto extends BaseRequestDto {
     /***
      * 用户头像绝对http://
      */
+    @Param(name = "用户头像")
     private String photo;
 
     /***
@@ -60,11 +65,13 @@ public class ModifyUserRequestDto extends BaseRequestDto {
      *
      * @see org.ca.common.user.enums.UserRole
      */
+    @Param(name = "用户角色")
     private Integer role;
 
     /***
      * 父帐号
      */
+    @Param(name = "用户父帐号")
     private String fatherUserId;
 
     public String getId() {

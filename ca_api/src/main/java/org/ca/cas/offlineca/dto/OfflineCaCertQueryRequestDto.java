@@ -1,5 +1,6 @@
 package org.ca.cas.offlineca.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseQueryPageRequestDto;
 
 import java.util.Date;
@@ -11,59 +12,73 @@ public class OfflineCaCertQueryRequestDto extends BaseQueryPageRequestDto {
     /***
      * 证书id
      */
+    @Param(name = "证书id")
     private String id;
     /***
      * CSR
      */
+    @Param(name = "证书CSR")
     private String reqBuf;
     /***
      * CSR类型
      */
+    @Param(name = "证书CSR类型")
     private Integer reqBufType;
     /***
      * 证书签名日期
      */
+    @Param(name = "证书签名日期")
     private Date signDate;
     /***
      * 证书签名值
      */
+    @Param(name = "证书签名值")
     private String signBuf;
     /***
      * 证书buf
      */
+    @Param(name = "证书buf")
     private String certBuf;
     /***
      * 证书链buf
      */
+    @Param(name = "证书链buf")
     private String certChainBuf;
 
     /***
      * 证书序列号
      */
+    @Param(name = "证书序列号")
     private String serialNumber;
     /***
      * 结束日期
      */
+    @Param(name = "结束日期")
     private Date notBefore;
     /***
      * 开始日期
      */
+    @Param(name = "开始日期")
     private Date notAfter;
     /***
      * 颁发者issueDn
      */
+    @Param(name = "颁发者issueDn")
     private String issuerDn;
     /***
      * 颁发者issueDn哈希
      */
+    @Param(name = "颁发者issueDn哈希")
     private String issuerDnHashMd5;
     /***
      * 用户
      */
+    @Param(name = "用户")
     private String subjectDn;
     /***
      * 用户哈希
      */
+    @Param(name = "用户哈希")
     private String subjectDnHashMd5;
 
     public String getId() {

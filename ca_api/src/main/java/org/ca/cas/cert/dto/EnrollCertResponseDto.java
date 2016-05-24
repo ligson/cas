@@ -1,5 +1,6 @@
 package org.ca.cas.cert.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseResponseDto;
 
 import java.math.BigInteger;
@@ -8,6 +9,7 @@ import java.math.BigInteger;
  * Created by ligson on 2016/5/6.
  */
 public class EnrollCertResponseDto extends BaseResponseDto {
+    @Param(name = "证书ID", required = true)
     private String certId;
 
     public String getCertId() {

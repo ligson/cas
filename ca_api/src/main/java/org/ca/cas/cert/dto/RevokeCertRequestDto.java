@@ -1,13 +1,17 @@
 package org.ca.cas.cert.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
 
 /**
  * Created by ligson on 2016/5/16.
  */
 public class RevokeCertRequestDto extends BaseRequestDto {
+    @Param(name = "管理员id", required = true)
     private String adminId;
+    @Param(name = "证书Id", required = true)
     private String certId;
+    @Param(name = "吊销原因", required = true)
     private Integer revokeReason;
 
     public String getAdminId() {

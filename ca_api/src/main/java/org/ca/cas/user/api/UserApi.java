@@ -1,6 +1,7 @@
 package org.ca.cas.user.api;
 
 import org.ca.cas.user.dto.*;
+import org.ligson.fw.core.facade.annotation.Api;
 import org.ligson.fw.core.facade.base.result.Result;
 
 /**
@@ -15,6 +16,7 @@ public interface UserApi {
      * @param requestDto
      * @return
      */
+    @Api(name = "注册接口")
     Result<RegisterResponseDto> register(RegisterRequestDto requestDto);
 
     /***
@@ -23,6 +25,7 @@ public interface UserApi {
      * @param requestDto
      * @return
      */
+    @Api(name = "用户查询接口")
     Result<QueryUserResponseDto> query(QueryUserRequestDto requestDto);
 
     /***
@@ -31,6 +34,7 @@ public interface UserApi {
      * @param requestDto
      * @return
      */
+    @Api(name = "用户登录接口")
     Result<LoginResponseDto> login(LoginRequestDto requestDto);
 
     /****
@@ -39,6 +43,7 @@ public interface UserApi {
      * @param requestDto
      * @return
      */
+    @Api(name = "用户信息修改接口")
     Result<ModifyUserResponseDto> modify(ModifyUserRequestDto requestDto);
 
     /****
@@ -47,6 +52,7 @@ public interface UserApi {
      * @param requestDto
      * @return
      */
+    @Api(name = "用户密码修改接口")
     Result<ModifyPwdResponseDto> modifyPwd(ModifyPwdRequestDto requestDto);
 
     /***
@@ -55,5 +61,6 @@ public interface UserApi {
      * @param requestDto
      * @return
      */
+    @Api(name = "密码重置接口")
     Result<ResetPwdResponseDto> resetPwd(ResetPwdRequestDto requestDto);
 }

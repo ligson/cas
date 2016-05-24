@@ -1,5 +1,6 @@
 package org.ca.cas.cert.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
 
 /**
@@ -9,8 +10,11 @@ public class ListKeyStoreRequestDto extends BaseRequestDto {
     /**
      * RSA(1, "RSA"), SM2(2, "SM2");
      */
+    @Param(name = "密钥类型", required = false)
     private int keyType;
+    @Param(name = "密钥长度", required = false)
     private int keySize;
+    @Param(name = "密钥个数", required = false)
     private int count;
 
     public int getKeyType() {

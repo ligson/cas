@@ -2,6 +2,7 @@ package org.ca.cas.offlineca.dto;
 
 import org.ca.common.user.enums.UserRole;
 import org.ca.common.user.enums.UserState;
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseQueryPageRequestDto;
 
 import java.util.Date;
@@ -10,21 +11,30 @@ import java.util.Date;
  * Created by ligson on 2016/5/20.
  */
 public class OfflineAdminQueryRequestDto extends BaseQueryPageRequestDto {
+    @Param(name = "管理员id")
     private String id;
+    @Param(name = "用户名")
     private String name;
+    @Param(name = "密码")
     private String password;
     /***
      * @see UserState#getCode()
      */
+    @Param(name = "用户状态")
     private Integer status;
     /***
      * @see UserRole#getCode()
      */
+    @Param(name = "用户角色")
     private Integer role;
 
+    @Param(name = "创建日期")
     private Date createDate;
+    @Param(name = "最后修改日期")
     private Date lastModifyDate;
+    @Param(name = "最后登陆日期")
     private Date lastLoginDate;
+    @Param(name = "最后登陆IP")
     private String lastLoginIp;
 
     public String getId() {

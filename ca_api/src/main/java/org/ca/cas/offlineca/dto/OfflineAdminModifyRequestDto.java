@@ -1,6 +1,7 @@
 package org.ca.cas.offlineca.dto;
 
 import org.ca.common.user.enums.UserState;
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseQueryPageRequestDto;
 
 
@@ -8,12 +9,16 @@ import org.ligson.fw.core.facade.base.dto.BaseQueryPageRequestDto;
  * Created by ligson on 2016/5/20.
  */
 public class OfflineAdminModifyRequestDto extends BaseQueryPageRequestDto {
+    @Param(name = "管理员id", required = true)
     private String id;
+    @Param(name = "用户名")
     private String name;
+    @Param(name = "密码")
     private String password;
     /***
      * @see UserState#getCode()
      */
+    @Param(name = "用户状态")
     private Integer status;
 
     public String getId() {

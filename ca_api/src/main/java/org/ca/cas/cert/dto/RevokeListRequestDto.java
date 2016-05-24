@@ -1,6 +1,7 @@
 package org.ca.cas.cert.dto;
 
 import org.ca.common.cert.enums.CertRevokeReason;
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseQueryPageRequestDto;
 
 import java.util.Date;
@@ -9,10 +10,15 @@ import java.util.Date;
  * Created by ligson on 2016/5/17.
  */
 public class RevokeListRequestDto extends BaseQueryPageRequestDto {
+    @Param(name = "吊销记录id")
     private String id;
+    @Param(name = "证书id")
     private String certId;
+    @Param(name = "证书序列号")
     private String certSerialNumber;
+    @Param(name = "吊销日期")
     private Date certRevokeDate;
+    @Param(name = "吊销的管理员id")
     private String adminId;
     /**
      * 吊销原因

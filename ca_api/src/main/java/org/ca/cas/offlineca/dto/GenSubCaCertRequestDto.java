@@ -1,12 +1,15 @@
 package org.ca.cas.offlineca.dto;
 
+import org.ligson.fw.core.facade.annotation.Param;
 import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
 
 /**
  * Created by ligson on 2016/5/18.
  */
 public class GenSubCaCertRequestDto extends BaseRequestDto {
+    @Param(name = "CA证书CSR", required = true)
     private String csr;
+    @Param(name = "颁发者证书id", required = true)
     private String issuerCertId;
 
     public String getCsr() {
