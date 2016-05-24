@@ -4,6 +4,9 @@ import cg.model.ApiCollection;
 import cg.model.ApiModel;
 import cg.model.ParamModel;
 import org.ca.cas.cert.api.CertApi;
+import org.ca.cas.offlineca.api.OfflineAdminApi;
+import org.ca.cas.offlineca.api.OfflineCaApi;
+import org.ca.cas.offlineca.vo.OfflineAdmin;
 import org.ca.cas.user.api.UserApi;
 
 import java.io.File;
@@ -15,7 +18,7 @@ import java.util.Map;
  */
 public class Test {
     public static void main(String[] args) {
-        ApiCollection collection = new ApiCollection(UserApi.class);
+        ApiCollection collection = new ApiCollection(OfflineCaApi.class);
         System.out.println(collection.getClazz().getName());
         //System.out.println(collection);
         for (ApiModel apiModel : collection.getApiModelList()) {
