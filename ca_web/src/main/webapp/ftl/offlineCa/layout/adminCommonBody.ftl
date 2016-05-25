@@ -32,7 +32,7 @@
                     <div id="user_toolbar">
                         <p>欢迎你,<a style="color:#FFF" iconCls="icon-user" class="easyui-linkbutton" plain="true"
                                   id="login_username"
-                                  href="${basePath}admin/userMgr/view.html?userId=">11111</a>&nbsp;&nbsp;
+                                  href="">${offlineAdminList[0].name}</a>&nbsp;&nbsp;
                             <a style="color:#FFF" class="easyui-linkbutton" iconCls="icon-control_power_blue"
                                plain="true" href="${basePath}offlineCa/logout.do">安全退出</a></p>
                     </div>

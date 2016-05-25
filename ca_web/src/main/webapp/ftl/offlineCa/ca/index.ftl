@@ -62,5 +62,30 @@
         </div>
     </form>
 </div>
+<div id="exportJksBtns">
+    <a class="easyui-linkbutton" onclick="$('#exportJksForm').form('submit')">下载</a>
+    <a class="easyui-linkbutton" onclick="$('#exportJksDlg').dialog('close')">取消</a>
+</div>
+<div buttons="#exportJksBtns" class="easyui-dialog" style="width:400px;" id="exportJksDlg" closed="true"
+     title="下载服务证书JKS文件">
+    <form style="width:350px;" class="form-horizontal" method="post" id="exportJksForm"
+          action="${basePath}offlineCa/exportJks.do">
+        <input type="hidden" name="certIds" value=""/>
+        <div class="form-group">
+            <label class="col-sm-4">保护密码：</label>
+            <div class="col-sm-8">
+                <input id="pwd1" type="password" required="true" class="form-control easyui-textbox" name="password"
+                       value=""/>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4">再次输入保护密码：</label>
+            <div class="col-sm-8">
+                <input type="password" validType="equalTo['#pwd1']" required="true" class="form-control easyui-textbox"
+                       name="retryPwd" value=""/>
+            </div>
+        </div>
+    </form>
+</div>
 </@override>
 <@extends name="offlineCa/layout/certMgr.ftl"/>

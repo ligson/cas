@@ -27,6 +27,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -385,5 +387,36 @@ public class OfflineCaController extends BaseController {
         return redirect("/offlineCa/login.html");
     }
 
+    @RequestMapping("/exportJks.do")
+    public void exportJks(@RequestParam("certIds") String certIds, @RequestParam("password") String password) {
+        String[] certIdArr = certIds.split(",");
+        List<OfflineAdmin> adminList = (List<OfflineAdmin>) session.getAttribute("offlineAdminList");
+        ExportCaCertJksRequestDto requestDto = new ExportCaCertJksRequestDto();
+        requestDto.setAdminId(adminList.get(0).getId());
+        List<String> certIdList = new ArrayList<>();
+        for (String certId : certIdArr) {
+            certIdList.add(certId);
+        }
+        requestDto.setCertIds(certIdList);
+        requestDto.setJksPassword(password);
+        Result<ExportCaCertJksResponseDto> exportResult = offlineCaApi.exportCaCertJks(requestDto);
+        if (exportResult.isSuccess()) {
+            byte[] buffer = exportResult.getData().getJksFile();
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;fileName=keystore.jks");
+            try {
+                response.getOutputStream().write(buffer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            response.setContentType("text/html");
+            try {
+                response.getWriter().println(exportResult.getFailureMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

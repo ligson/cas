@@ -83,6 +83,13 @@ $(function () {
             handler: function () {
                 delOfflineCert();
             }
+        }, {
+            id: "exportJks",
+            text: "导出jks",
+            iconCls: 'icon-add',
+            handler: function () {
+                showExportJksDlg();
+            }
         }]
     });
 });
@@ -166,6 +173,27 @@ function viewCsr(idx) {
     var rows = userGrid.datagrid("getRows");
     $("#csr").empty().append(rows[idx].reqBuf);
     $("#viewCsrDlg").dialog("open");
+}
+
+function showExportJksDlg() {
+    var userGrid = $("#tt");
+    var rows = userGrid.datagrid("getSelections");
+    if (rows.length == 0) {
+        alert("请选择要导出的证书");
+        return;
+    }
+    var certIds = "";
+    for (var i = 0; i < rows.length; i++) {
+        if (i != rows.length - 1) {
+            certIds += rows[i].id + ",";
+        } else {
+            certIds += rows[i].id;
+        }
+    }
+
+    var dlg = $("#exportJksDlg");
+    dlg.dialog("open");
+    dlg.find("input[name='certIds']").val(certIds);
 }
 
 function exportPrivate(certId) {
