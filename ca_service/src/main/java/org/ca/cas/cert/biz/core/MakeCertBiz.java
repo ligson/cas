@@ -127,9 +127,25 @@ public class MakeCertBiz {
         }
     }
 
+    /***
+     * 从base64字符串还原证书
+     *
+     * @param certBuf base64证书字符串
+     * @return
+     */
     public X509Certificate recoverCert(String certBuf) {
+        return recoverCert(Base64.decodeBase64(certBuf));
+    }
+
+    /***
+     * 从证书的encode还原正式
+     *
+     * @param certBuf 证书的二进制
+     * @return
+     */
+    public X509Certificate recoverCert(byte[] certBuf) {
         try {
-            Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(certBuf)));
+            Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(certBuf));
             return (X509Certificate) certificate;
         } catch (CertificateException e) {
             e.printStackTrace();

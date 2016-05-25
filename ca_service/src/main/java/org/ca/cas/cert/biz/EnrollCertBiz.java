@@ -1,10 +1,10 @@
 package org.ca.cas.cert.biz;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
@@ -31,9 +31,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import javax.security.auth.x500.X500Principal;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.*;
@@ -61,15 +59,9 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
     @Resource
     private UserService userService;
 
-    private static CertificateFactory certificateFactory;
 
     @Override
     public void before() {
-        try {
-            certificateFactory = CertificateFactory.getInstance("x509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -125,13 +117,27 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         CertEntity entity = new CertEntity();
         entity.setStatus(CertStatus.ENROLL.getCode());
         entity.setSubjectDn(requestDto.getSubjectDn());
-        entity.setSubjectDnHashMd5(requestDto.getSubjectDnHashMd5());
+        X500Name subject = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
+        try {
+            entity.setSubjectDnHashMd5(DigestUtils.md5Hex(subject.getEncoded()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            setFailureResult(CertFailEnum.E_BIZ_21016);
+            return null;
+        }
         entity.setUserId(requestDto.getUserId());
         entity.setReqDate(new Date());
         entity.setCertPin(requestDto.getCertPin());
         entity.setCertType(CertType.SIGN.getCode());
         entity.setIssuerDn(requestDto.getIssueDn());
-        entity.setIssuerDnHashMd5(requestDto.getIssueDnHashMd5());
+        X500Name issue = X500NameUtils.subjectToX500Name(requestDto.getIssueDn());
+        try {
+            entity.setIssuerDnHashMd5(DigestUtils.md5Hex(issue.getEncoded()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            setFailureResult(CertFailEnum.E_BIZ_21016);
+            return null;
+        }
         if (requestDto.getCsr() != null) {
             entity.setReqBuf(requestDto.getCsr());
             entity.setReqBufType(1);
@@ -143,6 +149,9 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
     @Override
     public Boolean txnPreProcessing() {
         CertEntity entity = certPreAdd();
+        if (entity == null) {
+            return false;
+        }
         PublicKey issuePublicKey;
         PrivateKey issuePrivateKey;
         PublicKey userPublicKey;
@@ -157,10 +166,8 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
         } else {
             CertEntity issueCert = (CertEntity) context.getAttr("issueCert");
-            Certificate certificate = null;
-            try {
-                certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(issueCert.getSignBuf())));
-            } catch (CertificateException e) {
+            X509Certificate certificate = makeCertBiz.recoverCert(issueCert.getSignBuf());
+            if (certificate == null) {
                 setFailureResult(CertFailEnum.E_BIZ_21006);
                 certService.delete(entity);
                 return false;
@@ -217,7 +224,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 certBuf = userCertObj.getEncoded();
                 entity.setSignBuf(Base64.encodeBase64String(certBuf));
                 certChainBuf = getCertChain(entity, certBuf);
-            } catch (CertificateEncodingException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 setFailureResult(CertFailEnum.E_BIZ_21004);
                 certService.delete(entity);
@@ -262,20 +269,12 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         }
     }
 
-    private byte[] getCertChain(CertEntity certEntity, byte[] certBuf) {
+    private byte[] getCertChain(CertEntity certEntity, byte[] certBuf) throws Exception {
         List<Certificate> x509Certs = new ArrayList<>();
-        try {
-            x509Certs.add(certificateFactory.generateCertificate(new ByteArrayInputStream(certBuf)));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        x509Certs.add(makeCertBiz.recoverCert(certBuf));
         CertEntity tmpEntity = certService.findBy("subjectDn", certEntity.getIssuerDn());
         while (tmpEntity != null) {
-            try {
-                x509Certs.add(certificateFactory.generateCertificate(new ByteArrayInputStream(Base64.decodeBase64(tmpEntity.getSignBuf()))));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            x509Certs.add(makeCertBiz.recoverCert(tmpEntity.getSignBuf()));
             if (tmpEntity.getSubjectDn().equals(tmpEntity.getIssuerDn())) {
                 break;
             }
@@ -284,13 +283,8 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         CMSProcessableByteArray cmsProc = new CMSProcessableByteArray("hi".getBytes());
 
         CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
-        try {
-            gen.addCertificates(new JcaCertStore(x509Certs));
-            return gen.generate(cmsProc, "BC").getEncoded();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        gen.addCertificates(new JcaCertStore(x509Certs));
+        return gen.generate(cmsProc, "BC").getEncoded();
 
     }
 
