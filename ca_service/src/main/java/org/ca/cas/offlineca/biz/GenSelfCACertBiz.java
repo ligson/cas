@@ -9,8 +9,8 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.ca.cas.cert.biz.EnrollCertBiz;
-import org.ca.cas.cert.biz.core.MakeCertBiz;
-import org.ca.cas.cert.biz.core.model.Extension;
+import org.ca.cas.common.biz.MakeCertBiz;
+import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
@@ -22,7 +22,6 @@ import org.ca.common.utils.X500NameUtils;
 import org.ligson.fw.core.common.biz.AbstractBiz;
 import org.ligson.fw.core.common.utils.IdUtils;
 import org.ligson.fw.core.facade.annotation.Api;
-import org.ligson.fw.string.encode.HashHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -86,7 +85,7 @@ public class GenSelfCACertBiz extends AbstractBiz<GenSelfCertRequestDto, GenSelf
         KeyPairContainer container = context.getAttr("keyContainer", KeyPairContainer.class);
         X500Name subject = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
         String serialNum = IdUtils.randomIntString();
-        Date notBefore = new Date();
+        Date notBefore= new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(notBefore);
         calendar.add(Calendar.YEAR, 1);

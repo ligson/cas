@@ -100,4 +100,13 @@ public interface CertApi {
     @Api(name = "下载CRL接口")
     Result<DownloadCrlResponseDto> downloadCrl(DownloadCrlRequestDto requestDto);
 
+    /***
+     * 导入管理员CA证书
+     *
+     * @param requestDto
+     * @return
+     */
+    @Api(name = "导入管理员CA证书")
+    Result<ImportCaCertResponseDto> importCaCert(ImportCaCertRequestDto requestDto);
+
 }

@@ -1,13 +1,10 @@
-package org.ca.cas.cert.biz.core;
+package org.ca.cas.common.biz;
 
-import org.apache.commons.codec.binary.*;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.jce.provider.X509CRLObject;
 import org.ca.cas.cert.domain.CertEntity;
 import org.ca.cas.cert.domain.CertRevokeEntity;
-import org.ca.cas.cert.vo.Cert;
-import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.ext.security.x509.X509Utils;
 import org.slf4j.Logger;
@@ -15,13 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
+import java.security.cert.*;
 import java.util.*;
 
 /**
@@ -33,16 +26,9 @@ public class MakeCrlBiz {
     private SignBiz signBiz;
     @Resource
     private KeyContainerBiz keyContainerBiz;
-    private static CertificateFactory certificateFactory;
+    @Resource
+    private MakeCertBiz makeCertBiz;
     private static Logger logger = LoggerFactory.getLogger(MakeCrlBiz.class);
-
-    static {
-        try {
-            certificateFactory = CertificateFactory.getInstance("x509");
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
-    }
 
     public X509CRL genCrl(CertEntity issuer, List<CertRevokeEntity> revokedCerts, Date thisUpdate, Date nextUpdate) {
         // crl--------------------------------------------------------------
@@ -70,12 +56,9 @@ public class MakeCrlBiz {
         v2CrlGen.setExtensions(x509extensions);
         //println(crlInfo.signAlg);
         AlgorithmIdentifier algSign;
-        byte[] caCertByte = org.apache.commons.codec.binary.Base64.decodeBase64(issuer.getSignBuf());
-        Certificate caCert = null;
-        try {
-            caCert = certificateFactory.generateCertificate(new ByteArrayInputStream(caCertByte));
-        } catch (CertificateException e) {
-            e.printStackTrace();
+
+        X509Certificate caCert = makeCertBiz.recoverCert(issuer.getSignBuf());
+        if (caCert == null) {
             return null;
         }
         String keyAlgId = caCert.getPublicKey().getAlgorithm();

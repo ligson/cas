@@ -2,12 +2,9 @@ package org.ca.cas.offlineca.biz;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.ca.cas.cert.biz.GenCsrBiz;
-import org.ca.cas.cert.biz.core.CsrBiz;
-import org.ca.cas.cert.biz.core.MakeCertBiz;
+import org.ca.cas.common.biz.CsrBiz;
+import org.ca.cas.common.biz.MakeCertBiz;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
@@ -20,12 +17,10 @@ import org.ligson.fw.core.facade.annotation.Api;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 

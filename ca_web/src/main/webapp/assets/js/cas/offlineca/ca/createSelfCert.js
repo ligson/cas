@@ -10,21 +10,21 @@ $(function () {
             validating: 'glyphicon glyphicon-refresh'
         },
         fields: {
-            o: {
+            O: {
                 validators: {
                     notEmpty: {
                         message: '禁止为空!'
                     }
                 }
             },
-            ou: {
+            OU: {
                 validators: {
                     notEmpty: {
                         message: '禁止为空！'
                     }
                 }
             },
-            cn: {
+            CN: {
                 validators: {
                     notEmpty: {
                         message: '禁止为空！'

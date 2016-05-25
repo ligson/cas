@@ -1,6 +1,6 @@
 package org.ca.cas.offlineca.biz;
 
-import org.ca.cas.cert.biz.core.MakeCertBiz;
+import org.ca.cas.common.biz.MakeCertBiz;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.offlineca.domain.OfflineCertEntity;
 import org.ca.cas.offlineca.dto.DownloadP12CaCertRequestDto;

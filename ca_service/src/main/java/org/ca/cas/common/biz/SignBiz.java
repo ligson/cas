@@ -1,4 +1,4 @@
-package org.ca.cas.cert.biz.core;
+package org.ca.cas.common.biz;
 
 import org.springframework.stereotype.Component;
 

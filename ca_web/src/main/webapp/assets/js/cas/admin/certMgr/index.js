@@ -29,14 +29,14 @@ $(function () {
                 field: 'subjectDn', title: '颁发给', width: 50
             },
             {
-                field: 'notAfter', title: '开始日期', width: 100, sortable: true, formatter: function (value) {
+                field: 'notBefore', title: '开始日期', width: 100, sortable: true, formatter: function (value) {
                 if (value != null) {
                     return new Date(value).format("yyyy-MM-dd HH:mm:ss");
                 }
             }
             },
             {
-                field: 'notBefore', title: '结束日期', width: 100, sortable: true, formatter: function (value) {
+                field: 'notAfter', title: '结束日期', width: 100, sortable: true, formatter: function (value) {
                 if (value != null) {
                     return new Date(value).format("yyyy-MM-dd HH:mm:ss");
                 }

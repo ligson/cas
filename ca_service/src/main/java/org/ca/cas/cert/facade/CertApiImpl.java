@@ -38,6 +38,9 @@ public class CertApiImpl implements CertApi {
     @Resource
     private DownloadCrlBiz downloadCrlBiz;
 
+    @Resource
+    private ImportCaCertBiz importCaCertBiz;
+
     @Override
     public Result<IssueCertResponseDto> issueCert(IssueCertRequestDto requestDto) {
         return null;
@@ -86,5 +89,10 @@ public class CertApiImpl implements CertApi {
     @Override
     public Result<DownloadCrlResponseDto> downloadCrl(DownloadCrlRequestDto requestDto) {
         return downloadCrlBiz.operation(requestDto);
+    }
+
+    @Override
+    public Result<ImportCaCertResponseDto> importCaCert(ImportCaCertRequestDto requestDto) {
+        return importCaCertBiz.operation(requestDto);
     }
 }

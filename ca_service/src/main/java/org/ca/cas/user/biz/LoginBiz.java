@@ -1,7 +1,6 @@
 package org.ca.cas.user.biz;
 
-import org.apache.commons.codec.binary.Base64;
-import org.ca.cas.cert.biz.core.MakeCertBiz;
+import org.ca.cas.common.biz.MakeCertBiz;
 import org.ca.cas.cert.domain.CertEntity;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.CertService;
@@ -22,11 +21,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 

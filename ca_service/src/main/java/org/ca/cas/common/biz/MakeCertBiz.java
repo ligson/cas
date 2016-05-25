@@ -1,4 +1,4 @@
-package org.ca.cas.cert.biz.core;
+package org.ca.cas.common.biz;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.DERNull;
@@ -10,8 +10,7 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v1CertificateBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
-import org.ca.cas.cert.biz.core.model.Extension;
-import org.ca.cas.common.biz.KeyContainerBiz;
+import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +79,7 @@ public class MakeCertBiz {
         } else {
             X509v3CertificateBuilder v3Builder = new X509v3CertificateBuilder(issuer, serial, notBefore, notAfter, subject, subjectPublicKeyInfo);
             if (extensionList != null && extensionList.size() > 0) {
-                for (Extension extension : extensionList) {
+                for (org.ca.cas.common.biz.model.Extension extension : extensionList) {
                     v3Builder.addExtension(extension.getOid(), extension.isCritical(), extension.getValue());
                 }
             }

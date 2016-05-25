@@ -1,6 +1,6 @@
 package org.ca.cas.offlineca.biz;
 
-import org.ca.cas.cert.biz.core.MakeCertBiz;
+import org.ca.cas.common.biz.MakeCertBiz;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
@@ -16,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;

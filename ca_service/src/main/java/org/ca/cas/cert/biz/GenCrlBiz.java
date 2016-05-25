@@ -1,7 +1,7 @@
 package org.ca.cas.cert.biz;
 
 import org.apache.commons.codec.binary.Base64;
-import org.ca.cas.cert.biz.core.MakeCrlBiz;
+import org.ca.cas.common.biz.MakeCrlBiz;
 import org.ca.cas.cert.domain.BaseCrlEntity;
 import org.ca.cas.cert.domain.CertEntity;
 import org.ca.cas.cert.domain.CertRevokeEntity;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;

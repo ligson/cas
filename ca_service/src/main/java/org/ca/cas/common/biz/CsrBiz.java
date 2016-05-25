@@ -1,4 +1,4 @@
-package org.ca.cas.cert.biz.core;
+package org.ca.cas.common.biz;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -33,5 +33,11 @@ public class CsrBiz {
             logger.error("CSR生成失败:{}", e.getMessage());
             return null;
         }
+    }
+
+    public PKCS10CertificationRequest readCsr(String csr) {
+        byte[] buffer = Base64.decodeBase64(csr);
+        PKCS10CertificationRequest request = new PKCS10CertificationRequest(buffer);
+        return request;
     }
 }

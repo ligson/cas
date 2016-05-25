@@ -27,6 +27,8 @@ dependencies {
     }
     compile "org.bouncycastle:bctsp-jdk16:1.46"
     compile "org.springframework:spring-tx:${springVersion}"
+
+    compile "joda-time:joda-time:2.9.3"
 }
 //排除resources文件
 jar {

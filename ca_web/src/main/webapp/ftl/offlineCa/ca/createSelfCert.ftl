@@ -17,19 +17,19 @@
         <div class="form-group">
             <label class="col-sm-4">组织(O)</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control subjectItem" name="o" value="${RequestParameters['o']}"/>
+                <input type="text" class="form-control subjectItem" name="O" value="${RequestParameters['O']}"/>
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-4">组织单位(OU)</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control subjectItem" name="ou" value="${RequestParameters['ou']}"/>
+                <input type="text" class="form-control subjectItem" name="OU" value="${RequestParameters['OU']}"/>
             </div>
         </div>
         <div class="form-group">
             <label class="col-sm-4">姓名(CN)</label>
             <div class="col-sm-8">
-                <input type="text" class="form-control subjectItem" name="cn" value="${RequestParameters['cn']}"/>
+                <input type="text" class="form-control subjectItem" name="CN" value="${RequestParameters['CN']}"/>
             </div>
         </div>
         <div class="form-group">

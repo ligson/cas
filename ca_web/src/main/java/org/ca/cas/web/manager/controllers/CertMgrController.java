@@ -51,6 +51,7 @@ public class CertMgrController extends BaseController {
         Result<QueryCertResponseDto> queryResult = certApi.queryCert(requestDto);
         if (queryResult.isSuccess()) {
             if (queryResult.getData().getCert() == null) {
+                session.setAttribute("initUserId", user.getId());
                 return redirect("/admin/certMgr/initAdminCert.html");
             }
         }
@@ -60,6 +61,8 @@ public class CertMgrController extends BaseController {
 
     @RequestMapping("/initAdminCert.html")
     public String toInitAdminCert() {
+        User user = (User) session.getAttribute("adminUser");
+        session.setAttribute("initUserId", user.getId());
         ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
         Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
         if (listResult.isSuccess()) {

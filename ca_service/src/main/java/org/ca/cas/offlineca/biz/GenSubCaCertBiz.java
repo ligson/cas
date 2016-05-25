@@ -9,8 +9,8 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.ca.cas.cert.biz.core.MakeCertBiz;
-import org.ca.cas.cert.biz.core.model.Extension;
+import org.ca.cas.common.biz.MakeCertBiz;
+import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
@@ -120,11 +120,11 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         KeyPairContainer issuerContainer = keyContainerBiz.getKeyPair(issuerCertObj.getPublicKey());
 
         String serialNum = IdUtils.randomIntString();
-        Date notAfter = new Date();
+        Date notBefore = new Date();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(notAfter);
+        calendar.setTime(notBefore);
         calendar.add(Calendar.YEAR, 1);
-        Date notBefore = calendar.getTime();
+        Date notAfter = calendar.getTime();
         List<Extension> extensions = new ArrayList<>();
         Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, false, new BasicConstraints(4));
         extensions.add(extension);

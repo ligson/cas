@@ -8,8 +8,8 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
-import org.ca.cas.cert.biz.core.MakeCertBiz;
-import org.ca.cas.cert.biz.core.model.Extension;
+import org.ca.cas.common.biz.MakeCertBiz;
+import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.cas.user.domain.UserEntity;
@@ -165,14 +165,15 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             userPublicKey = caContainer.getPublicKey();
             subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
         } else {
-            CertEntity issueCert = (CertEntity) context.getAttr("issueCert");
-            X509Certificate certificate = makeCertBiz.recoverCert(issueCert.getSignBuf());
-            if (certificate == null) {
+            CertEntity issueCertEntity = (CertEntity) context.getAttr("issueCert");
+            //TODO 导入中级证书时issueCert可能为空
+            X509Certificate issueCert = makeCertBiz.recoverCert(issueCertEntity.getSignBuf());
+            if (issueCert == null) {
                 setFailureResult(CertFailEnum.E_BIZ_21006);
                 certService.delete(entity);
                 return false;
             }
-            caContainer = keyContainerBiz.getKeyPair(certificate.getPublicKey());
+            caContainer = keyContainerBiz.getKeyPair(issueCert.getPublicKey());
             issuePublicKey = caContainer.getPublicKey();
             issuePrivateKey = caContainer.getPrivateKey();
             if (requestDto.getKeyId() != null) {
@@ -191,7 +192,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                     return false;
                 }
             }
-            X500Name issueDn = X500NameUtils.subjectToX500Name(requestDto.getIssueDn());
+            X500Name issueDn = X500Name.getInstance(issueCert.getSubjectX500Principal().getEncoded());
 
 
             Date startDate = requestDto.getStartDate();
@@ -199,7 +200,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             calendar.setTime(startDate);
             calendar.add(Calendar.YEAR, 1);
             Date endDate = calendar.getTime();
-            List<org.ca.cas.cert.biz.core.model.Extension> extensions = new ArrayList<>();
+            List<org.ca.cas.common.biz.model.Extension> extensions = new ArrayList<>();
             UserEntity userEntity = (UserEntity) context.getAttr("user");
             if (userEntity.getRole() == UserRole.CA_ADMIN.getCode()) {
                 Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, true, new BasicConstraints(2));
@@ -269,7 +270,7 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         }
     }
 
-    private byte[] getCertChain(CertEntity certEntity, byte[] certBuf) throws Exception {
+    public byte[] getCertChain(CertEntity certEntity, byte[] certBuf) throws Exception {
         List<Certificate> x509Certs = new ArrayList<>();
         x509Certs.add(makeCertBiz.recoverCert(certBuf));
         CertEntity tmpEntity = certService.findBy("subjectDn", certEntity.getIssuerDn());

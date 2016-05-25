@@ -1,4 +1,4 @@
-package org.ca.cas.cert.biz.core.model;
+package org.ca.cas.common.biz.model;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
