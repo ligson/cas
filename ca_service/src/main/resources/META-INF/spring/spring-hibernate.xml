@@ -29,11 +29,11 @@
         <property name="poolPreparedStatements" value="true"/>
         <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
         <!-- 超过时间限制是否回收 -->
-        <property name="removeAbandoned" value="true" />
+        <property name="removeAbandoned" value="true"/>
         <!-- 超时时间；单位为秒。180秒=3分钟 -->
-        <property name="removeAbandonedTimeout" value="180" />
+        <property name="removeAbandonedTimeout" value="180"/>
         <!-- 关闭abanded连接时输出错误日志 -->
-        <property name="logAbandoned" value="true" />
+        <property name="logAbandoned" value="true"/>
     </bean>
 
     <bean id="mySessionFactory"
@@ -74,19 +74,20 @@
 
     <!--注解型事务扫描 -->
     <!-- <tx:annotation-driven /> -->
-    <tx:advice id="baseServiceAdvice" transaction-manager="transactionManager">
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <tx:method name="find*" read-only="true" propagation="REQUIRED"/>
-            <tx:method name="add*" propagation="REQUIRED"/>
-            <tx:method name="update*" propagation="REQUIRED"/>
-            <tx:method name="save*" propagation="REQUIRED"/>
-            <tx:method name="*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="persistence" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="operation" propagation="REQUIRED" rollback-for="Exception"/>
         </tx:attributes>
     </tx:advice>
     <aop:config>
-        <aop:pointcut expression="execution(* org.ca.cas.*.service..*.*(..))"
-                      id="bussinessService1"/>
-        <aop:advisor advice-ref="baseServiceAdvice" pointcut-ref="bussinessService1"/>
+        <aop:pointcut expression="execution(* org.ca.cas.*.biz.*Biz.*.*(..))"
+                      id="managerMethod"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="managerMethod"/>
     </aop:config>
 
 </beans>

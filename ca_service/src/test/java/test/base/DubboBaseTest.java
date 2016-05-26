@@ -12,7 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class DubboBaseTest {
     protected static Logger logger;
-    static ApplicationContext applicationContext = new ClassPathXmlApplicationContext
+    protected static ApplicationContext applicationContext = new ClassPathXmlApplicationContext
             ("spring-conf.xml");
     protected static OfflineCaApi offlineCaApi = (OfflineCaApi) applicationContext.getBean("offlineCaApi");
 

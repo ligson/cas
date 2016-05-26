@@ -148,7 +148,7 @@ public class LoginBiz extends AbstractBiz<LoginRequestDto, LoginResponseDto> {
         User user = new User();
         BeanUtils.copyProperties(entity, user);
         responseDto.setUser(user);
-        responseDto.setSuccess(true);
+        setSuccessResult();
         return true;
     }
 

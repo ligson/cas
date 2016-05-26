@@ -15,5 +15,9 @@
                      interface="org.ca.cas.offlineca.api.OfflineCaApi"
                      timeout="${dubbo.consumer.timeout}"
                      version="${dubbo.iterface.version}"/>
+    <dubbo:reference id="userApi"
+                     interface="org.ca.cas.user.api.UserApi"
+                     timeout="${dubbo.consumer.timeout}"
+                     version="${dubbo.iterface.version}"/>
     <!--直连增加url="${dubbo.registry.address}"-->
 </beans>
