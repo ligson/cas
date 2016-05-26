@@ -45,7 +45,7 @@ public class ListUserKeyBiz extends AbstractBiz<ListUserKeyRequestDto, ListUserK
     public Boolean txnPreProcessing() {
         KeyQueryRequestDto keyQueryRequestDto = new KeyQueryRequestDto();
         keyQueryRequestDto.setKeyStatus(KeyStatus.READY.getCode());
-        keyQueryRequestDto.setKeyType(KeyType.SM2.getCode());
+        //keyQueryRequestDto.setKeyType(KeyType.SM2.getCode());
         keyQueryRequestDto.setPageNum(requestDto.getPageNum());
         keyQueryRequestDto.setPageSize(requestDto.getPageSize());
         Result<KeyQueryResponseDto> queryKeyResult = keyApi.queryKey(keyQueryRequestDto);
@@ -59,7 +59,7 @@ public class ListUserKeyBiz extends AbstractBiz<ListUserKeyRequestDto, ListUserK
             keyPair.setKeyType(key.getKeyType());
             responseDto.getKeyPairs().add(keyPair);
         }
-
+        responseDto.setTotalCount(queryKeyResult.getData().getTotalCount());
         responseDto.setSuccess(true);
         return true;
     }
