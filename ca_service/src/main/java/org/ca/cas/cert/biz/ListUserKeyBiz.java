@@ -7,6 +7,7 @@ import org.ca.kms.key.api.KeyApi;
 import org.ca.kms.key.dto.KeyQueryRequestDto;
 import org.ca.kms.key.dto.KeyQueryResponseDto;
 import org.ca.kms.key.enums.KeyStatus;
+import org.ca.kms.key.enums.KeyType;
 import org.ca.kms.key.vo.Key;
 import org.ligson.fw.core.common.biz.AbstractBiz;
 import org.ligson.fw.core.facade.annotation.Api;
@@ -44,6 +45,7 @@ public class ListUserKeyBiz extends AbstractBiz<ListUserKeyRequestDto, ListUserK
     public Boolean txnPreProcessing() {
         KeyQueryRequestDto keyQueryRequestDto = new KeyQueryRequestDto();
         keyQueryRequestDto.setKeyStatus(KeyStatus.READY.getCode());
+        keyQueryRequestDto.setKeyType(KeyType.SM2.getCode());
         keyQueryRequestDto.setPageNum(requestDto.getPageNum());
         keyQueryRequestDto.setPageSize(requestDto.getPageSize());
         Result<KeyQueryResponseDto> queryKeyResult = keyApi.queryKey(keyQueryRequestDto);
@@ -54,7 +56,7 @@ public class ListUserKeyBiz extends AbstractBiz<ListUserKeyRequestDto, ListUserK
             keyPair.setKeyStatus(key.getKeyStatus());
             keyPair.setCreateTime(key.getCreateTime());
             keyPair.setKeySize(key.getKeySize());
-            keyPair.setKeySize(key.getKeyType());
+            keyPair.setKeyType(key.getKeyType());
             responseDto.getKeyPairs().add(keyPair);
         }
 

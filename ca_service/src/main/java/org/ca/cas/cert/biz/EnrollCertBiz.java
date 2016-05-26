@@ -11,6 +11,7 @@ import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.ca.cas.common.biz.MakeCertBiz;
 import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.common.biz.KeyContainerBiz;
+import org.ca.cas.common.main.Startup;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.cas.user.domain.UserEntity;
 import org.ca.cas.user.service.UserService;
@@ -176,19 +177,26 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
             caContainer = keyContainerBiz.getKeyPair(issueCert.getPublicKey());
             issuePublicKey = caContainer.getPublicKey();
             issuePrivateKey = caContainer.getPrivateKey();
+            PKCS10CertificationRequest request = null;
             if (requestDto.getKeyId() != null) {
                 KeyPairContainer userkeyPairContainer = keyContainerBiz.getKeyPair(requestDto.getKeyId());
                 userPublicKey = userkeyPairContainer.getPublicKey();
                 subjectDn = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
             } else {
                 byte[] buffer = Base64.decodeBase64(requestDto.getCsr());
-                PKCS10CertificationRequest request = new PKCS10CertificationRequest(buffer);
+                request = new PKCS10CertificationRequest(buffer);
                 try {
-                    userPublicKey = request.getPublicKey();
+                    try {
+                        userPublicKey = request.getPublicKey();
+                    } catch (Exception e) {
+                        userPublicKey = request.getPublicKey(Startup.TOP_SM_PROVIDER.getName());
+                    }
+
                     subjectDn = X500NameUtils.subjectToX500Name(request.getCertificationRequestInfo().getSubject().toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                     setFailureResult(CertFailEnum.E_BIZ_21008);
+                    certService.delete(entity);
                     return false;
                 }
             }
@@ -209,7 +217,13 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
                 Extension extension = new Extension(org.bouncycastle.asn1.x509.X509Extension.basicConstraints, true, new BasicConstraints(1));
                 extensions.add(extension);
             }
-            X509Certificate userCertObj = makeCertBiz.gen(userPublicKey, issuePrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, extensions);
+            X509Certificate userCertObj = null;
+            if (request != null) {
+                userCertObj = makeCertBiz.genV3(request.getCertificationRequestInfo().getSubjectPublicKeyInfo(), issuePrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, extensions);
+            } else {
+                userCertObj = makeCertBiz.gen(userPublicKey, issuePrivateKey, issueDn, subjectDn, new BigInteger(entity.getId()), startDate, endDate, extensions);
+            }
+
 
             try {
                 userCertObj.verify(issuePublicKey);
