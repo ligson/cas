@@ -1,12 +1,13 @@
 package org.ca.cas.cert.dto;
 
 import org.ligson.fw.core.facade.annotation.Param;
+import org.ligson.fw.core.facade.base.dto.BaseQueryPageRequestDto;
 import org.ligson.fw.core.facade.base.dto.BaseRequestDto;
 
 /**
  * Created by ligson on 2016/5/13.
  */
-public class ListKeyStoreRequestDto extends BaseRequestDto {
+public class ListKeyStoreRequestDto extends BaseQueryPageRequestDto {
     /**
      * RSA(1, "RSA"), SM2(2, "SM2");
      */

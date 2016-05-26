@@ -5,7 +5,6 @@
 <script type="text/javascript" src="${assetsPath}js/cas/offlineca/ca/createSelfCert.js"></script>
 </@override>
 <@override name="body">
-<div class="col-sm-4"></div>
 <div class="col-sm-4">
     <form id="enrollForm" class="form-horizontal" method="post" action="${basePath}offlineCa/createSelfCert.do">
         <input type="hidden" name="subjectDn" value=""/>
@@ -37,13 +36,13 @@
             <div class="col-sm-8">
                 <select name="aliase" class="form-control">
                     <#list keys as key>
-                        <option value="${key}">${key}</option>
+                        <option value="${key.aliase}">${(key.keyType==1)?string("RSA","SM2")}-${key.keySize}(${key.aliase})</option>
                     </#list>
                 </select>
             </div>
         </div>
         <div class="form-group text-center">
-            <input type="submit" class="btn-info" value="提交"/>
+            <input type="submit" class="btn btn-info" value="提交"/>
         </div>
     </form>
 </div>

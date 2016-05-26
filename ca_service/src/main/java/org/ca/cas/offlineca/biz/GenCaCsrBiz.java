@@ -4,7 +4,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.ca.cas.cert.biz.EnrollCertBiz;
+import org.ca.cas.cert.biz.GenCsrBiz;
 import org.ca.cas.cert.enums.CertFailEnum;
+import org.ca.cas.common.biz.CsrBiz;
 import org.ca.cas.common.biz.KeyContainerBiz;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.cas.offlineca.dto.GenCaCsrRequestDto;
@@ -24,6 +26,8 @@ import javax.annotation.Resource;
 public class GenCaCsrBiz extends AbstractBiz<GenCaCsrRequestDto, GenCaCsrResponseDto> {
     @Resource
     private KeyContainerBiz keyContainerBiz;
+    @Resource
+    private CsrBiz csrBiz;
 
     @Override
     public void before() {
@@ -51,12 +55,12 @@ public class GenCaCsrBiz extends AbstractBiz<GenCaCsrRequestDto, GenCaCsrRespons
     public Boolean txnPreProcessing() {
         KeyPairContainer container = context.getAttr("keyContainer", KeyPairContainer.class);
         X500Name subject = X500NameUtils.subjectToX500Name(requestDto.getSubjectDn());
-        PKCS10CertificationRequest csr = EnrollCertBiz.genCsr(container, subject);
+        String csr = csrBiz.genCsr(subject, container.getPublicKey(), container.getPrivateKey());
         if (csr == null) {
             setFailureResult(CertFailEnum.E_BIZ_21004);
             return false;
         }
-        responseDto.setCsr(Base64.encodeBase64String(csr.getEncoded()));
+        responseDto.setCsr(csr);
         setSuccessResult();
         return true;
     }

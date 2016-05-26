@@ -30,6 +30,8 @@ public class OfflineCaApiImpl implements OfflineCaApi {
     private DeleteOfflineCertBiz deleteOfflineCertBiz;
     @Resource
     private ExportCaCertJksBiz exportCaCertJksBiz;
+    @Resource
+    private CreateOfflineKeyBiz createOfflineKeyBiz;
 
     @Override
     public Result<GenCaCsrResponseDto> genCaCsr(GenCaCsrRequestDto requestDto) {
@@ -69,5 +71,10 @@ public class OfflineCaApiImpl implements OfflineCaApi {
     @Override
     public Result<ExportCaCertJksResponseDto> exportCaCertJks(ExportCaCertJksRequestDto requestDto) {
         return exportCaCertJksBiz.operation(requestDto);
+    }
+
+    @Override
+    public Result<CreateOfflineKeyResponseDto> createOfflineKey(CreateOfflineKeyRequestDto requestDto) {
+        return createOfflineKeyBiz.operation(requestDto);
     }
 }

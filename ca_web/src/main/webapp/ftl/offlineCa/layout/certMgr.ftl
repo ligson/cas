@@ -25,6 +25,11 @@
                 <li><a href="${basePath}offlineCa/userList.html">管理员列表</a></li>
             </ul>
         </div>
+        <div title="离线Key管理" data-options="iconCls:'icon-ok'" style="overflow:auto;padding:10px;">
+            <ul class="easyui-tree">
+                <li><a href="${basePath}offlineCa/keyList.html">离线Key列表</a></li>
+            </ul>
+        </div>
     </div>
 
 </div>

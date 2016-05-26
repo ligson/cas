@@ -4,15 +4,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.api.CertApi;
 import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
+import org.ca.cas.cert.vo.KeyPair;
 import org.ca.cas.offlineca.api.OfflineCaApi;
 import org.ca.cas.user.api.UserApi;
 import org.ca.cas.user.dto.*;
 import org.ca.common.user.enums.UserRole;
-import org.ca.kms.key.api.KeyApi;
-import org.ca.kms.key.dto.KeyQueryRequestDto;
-import org.ca.kms.key.dto.KeyQueryResponseDto;
-import org.ca.kms.key.enums.KeyStatus;
-import org.ca.kms.key.vo.Key;
 import org.ligson.fw.core.facade.base.result.Result;
 import org.ligson.fw.string.encode.HashHelper;
 import org.ligson.fw.web.controller.BaseController;
@@ -25,7 +21,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -86,7 +81,7 @@ public class PubController extends BaseController {
         ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
         Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
         if (listResult.isSuccess()) {
-            List<String> keys = listResult.getData().getAliases();
+            List<KeyPair> keys = listResult.getData().getKeyPairs();
             request.setAttribute("keys", keys);
         }
         return "pub/initCert";

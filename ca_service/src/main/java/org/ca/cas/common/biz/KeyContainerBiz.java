@@ -86,6 +86,12 @@ public class KeyContainerBiz implements InitializingBean {
         }
     }
 
+    public void storeKey(String aliase, PublicKey publicKey, PrivateKey privateKey) throws Exception {
+        Certificate certificate = CertUtil.wrapToCertContainer(publicKey);
+        keyStore.setKeyEntry(aliase, privateKey, keyPwd.toCharArray(), new Certificate[]{certificate});
+        keyStore.store(new FileOutputStream(keyJks), keyPwd.toCharArray());
+    }
+
     public byte[] sign(byte[] buffer, Certificate certificate) {
         try {
             String alias = keyStore.getCertificateAlias(certificate);
@@ -180,20 +186,21 @@ public class KeyContainerBiz implements InitializingBean {
         }
         return null;
     }
+
     public KeyPairContainer getKeyPair(String aliase) {
         KeyPairContainer container = new KeyPairContainer();
         try {
             Certificate certificate = keyStore.getCertificate(aliase);
             PublicKey publicKey = certificate.getPublicKey();
             PrivateKey privateKey = (PrivateKey) keyStore.getKey(aliase, keyPwd.toCharArray());
-            String type = certificate.getType();
+            String type = certificate.getPublicKey().getAlgorithm();
             container.setPrivateKey(privateKey);
             container.setPublicKey(publicKey);
             container.setType(type);
             if (type.equals("RSA")) {
                 KeyFactory keyFact = KeyFactory.getInstance(type);
                 RSAPublicKeySpec keySpec = keyFact.getKeySpec(publicKey, RSAPublicKeySpec.class);
-                container.setKeySize(keySpec.getModulus().intValue());
+                container.setKeySize(keySpec.getModulus().toString(2).length());
             } else if (type.equals("SM2")) {
                 container.setKeySize(256);
             }

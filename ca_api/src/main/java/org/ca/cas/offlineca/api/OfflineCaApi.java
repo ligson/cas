@@ -74,4 +74,7 @@ public interface OfflineCaApi {
 
     @Api(name = "导出离线CA证书到jks文件接口")
     Result<ExportCaCertJksResponseDto> exportCaCertJks(ExportCaCertJksRequestDto requestDto);
+
+    @Api(name = "创建离线密钥接口")
+    Result<CreateOfflineKeyResponseDto> createOfflineKey(CreateOfflineKeyRequestDto requestDto);
 }

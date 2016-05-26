@@ -13,6 +13,7 @@ import org.ca.cas.common.biz.MakeCertBiz;
 import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.common.biz.KeyContainerBiz;
+import org.ca.cas.common.main.Startup;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.cas.offlineca.domain.OfflineCertEntity;
 import org.ca.cas.offlineca.dto.GenSubCaCertRequestDto;
@@ -64,8 +65,13 @@ public class GenSubCaCertBiz extends AbstractBiz<GenSubCaCertRequestDto, GenSubC
         byte[] csrBuffer = Base64.decodeBase64(requestDto.getCsr());
         PKCS10CertificationRequest request = new PKCS10CertificationRequest(csrBuffer);
         try {
-            PublicKey publicKey = request.getPublicKey();
-            context.setAttr("publicKey", publicKey);
+            try {
+                PublicKey publicKey = request.getPublicKey();
+                context.setAttr("publicKey", publicKey);
+            } catch (Exception e) {
+                PublicKey publicKey = request.getPublicKey(Startup.TOP_SM_PROVIDER.getName());
+                context.setAttr("publicKey", publicKey);
+            }
             context.setAttr("csr", request);
         } catch (Exception e) {
             e.printStackTrace();

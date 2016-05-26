@@ -272,6 +272,8 @@ public class EnrollCertBiz extends AbstractBiz<EnrollCertRequestDto, EnrollCertR
         return true;
     }
 
+
+
     public static PKCS10CertificationRequest genCsr(KeyPairContainer keyPair, X500Name subject) {
         try {
             //生成csr

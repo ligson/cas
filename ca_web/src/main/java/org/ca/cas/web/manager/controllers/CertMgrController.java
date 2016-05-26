@@ -3,6 +3,7 @@ package org.ca.cas.web.manager.controllers;
 import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.dto.*;
 import org.ca.cas.cert.vo.Cert;
+import org.ca.cas.cert.vo.KeyPair;
 import org.ca.cas.user.api.UserApi;
 import org.ca.cas.user.dto.QueryUserRequestDto;
 import org.ca.cas.user.dto.QueryUserResponseDto;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +66,7 @@ public class CertMgrController extends BaseController {
         ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
         Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
         if (listResult.isSuccess()) {
-            List<String> keys = listResult.getData().getAliases();
+            List<KeyPair> keys = listResult.getData().getKeyPairs();
             request.setAttribute("keys", keys);
         }
         return "admin/certMgr/initAdminCert";

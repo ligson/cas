@@ -4,9 +4,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.ca.cas.cert.api.CertApi;
 import org.ca.cas.cert.dto.ListKeyStoreRequestDto;
 import org.ca.cas.cert.dto.ListKeyStoreResponseDto;
-import org.ca.cas.cert.dto.QueryCertRequestDto;
-import org.ca.cas.cert.dto.QueryCertResponseDto;
-import org.ca.cas.cert.vo.Cert;
 import org.ca.cas.offlineca.api.OfflineAdminApi;
 import org.ca.cas.offlineca.api.OfflineCaApi;
 import org.ca.cas.offlineca.dto.*;
@@ -27,8 +24,6 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -73,12 +68,50 @@ public class OfflineCaController extends BaseController {
         return webResult;
     }
 
+    @RequestMapping("/keyList.html")
+    public String toKeyList() {
+        return "offlineCa/ca/keyList";
+    }
+
+    @ResponseBody
+    @RequestMapping("/keyList.json")
+    public WebResult keyList(ListKeyStoreRequestDto requestDto) {
+        String pageString = request.getParameter("page");
+        int page = Integer.parseInt(pageString);
+        requestDto.setPageNum(page);
+        String rowString = request.getParameter("rows");
+        int rows = Integer.parseInt(rowString);
+        requestDto.setPageSize(rows);
+
+        Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
+        if (listResult.isSuccess()) {
+            webResult.setSuccess(true);
+            webResult.put("rows", listResult.getData().getKeyPairs());
+            webResult.put("total", listResult.getData().getTotalCount());
+        } else {
+            webResult.setError(listResult);
+        }
+        return webResult;
+    }
+
+    @ResponseBody
+    @RequestMapping("/createOfflineKey.json")
+    public WebResult createOfflineKey(CreateOfflineKeyRequestDto requestDto) {
+        Result<CreateOfflineKeyResponseDto> createResult = offlineCaApi.createOfflineKey(requestDto);
+        if (createResult.isSuccess()) {
+            webResult.setSuccess(true);
+        } else {
+            webResult.setError(createResult);
+        }
+        return webResult;
+    }
+
     @RequestMapping("/createSelfCert.html")
     public String toCreateSelfCert() {
         ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
         Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
         if (listResult.isSuccess()) {
-            request.setAttribute("keys", listResult.getData().getAliases());
+            request.setAttribute("keys", listResult.getData().getKeyPairs());
             return "offlineCa/ca/createSelfCert";
         } else {
             logger.error("list key store error:{}", listResult);
@@ -120,7 +153,7 @@ public class OfflineCaController extends BaseController {
         ListKeyStoreRequestDto requestDto = new ListKeyStoreRequestDto();
         Result<ListKeyStoreResponseDto> listResult = certApi.listKeyStore(requestDto);
         if (listResult.isSuccess()) {
-            request.setAttribute("keys", listResult.getData().getAliases());
+            request.setAttribute("keys", listResult.getData().getKeyPairs());
             return "offlineCa/ca/genCaCsr";
         } else {
             logger.error("list key store error:{}", listResult);

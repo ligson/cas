@@ -2,6 +2,7 @@ package org.ca.cas.common.biz;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -13,6 +14,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.ca.cas.common.biz.model.Extension;
 import org.ca.cas.common.model.KeyPairContainer;
 import org.ca.ext.security.x509.AlgorithmId;
+import org.ca.ext.security.x509.X509Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -55,16 +57,19 @@ public class MakeCertBiz {
 
     private X509Certificate gen(String version, SubjectPublicKeyInfo
             subjectPublicKeyInfo, PrivateKey privateKey, X500Name issuer, X500Name subject, BigInteger serial, Date notBefore, Date notAfter, List<Extension> extensionList) {
-        AlgorithmIdentifier signAlg = new AlgorithmIdentifier(PKCSObjectIdentifiers.sha1WithRSAEncryption, DERNull.INSTANCE);
+        DERObjectIdentifier oid;
         if (privateKey.getAlgorithm().equals("SM2")) {
-            signAlg = new AlgorithmIdentifier(AlgorithmId.SM3withSM2_oid.toString());
+            oid = new DERObjectIdentifier("1.2.156.10197.1.501");
+        } else {
+            oid = X509Utils.getAlgorithmOID("SHA1withRSA");
         }
-        final AlgorithmIdentifier finalSignAlg = signAlg;
+
+        final DERObjectIdentifier finalOid = oid;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ContentSigner signer = new ContentSigner() {
             @Override
             public AlgorithmIdentifier getAlgorithmIdentifier() {
-                return finalSignAlg;
+                return new AlgorithmIdentifier(finalOid);
             }
 
             @Override
@@ -76,7 +81,7 @@ public class MakeCertBiz {
             public byte[] getSignature() {
                 String signAlg = "SHA1withRSA";
                 if (privateKey.getAlgorithm().equals("SM2")) {
-                    signAlg = "SM3withRSA";
+                    signAlg = "SM3withSM2";
                 }
                 return signBiz.sign(bos.toByteArray(), signAlg, privateKey);
             }

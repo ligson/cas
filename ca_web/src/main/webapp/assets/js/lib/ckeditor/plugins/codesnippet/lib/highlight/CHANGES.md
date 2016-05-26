@@ -44,9 +44,9 @@ New features:
 
 - Languages now can be recognized by multiple names like "js" for JavaScript or
   "html" for, well, HTML (which earlier insisted on calling it "xml"). These
-  aliases can be specified in the class attribute of the code container in your
+  keyPairs can be specified in the class attribute of the code container in your
   HTML as well as in various API calls. For now there are only a few very common
-  aliases but we'll expand it in the future. All of them are listed in the
+  keyPairs but we'll expand it in the future. All of them are listed in the
   [class reference][].
 
 - Language detection can now be restricted to a subset of languages relevant in
