@@ -71,14 +71,14 @@ public class MethodInvoker implements MethodInterceptor {
                         logger.debug("{}调用完成:{}【{}】，耗时{}ms", PERFIX, api.name(), bizClass.getName(), end - start);
                         logger.debug("/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=/\\=");
                         //dataSource.getConnection().close();
-                        try{
+                        /*try{
                             Session session = sessionFactory.getCurrentSession();
                             if (session != null) {
                                 session.close();
                             }
                         }catch(HibernateException e){
                             logger.warn("session close exception:{}",e.getMessage());
-                        }
+                        }*/
                     }
                     return result;
                 }
