@@ -21,7 +21,7 @@ public class EnrollCertRequestDto extends BaseRequestDto {
     private String certPin;
     @Param(name = "颁发者", required = true)
     private String issueDn;
-    @Param(name = "颁发者哈希", required = true)
+    @Param(name = "颁发者哈希", required = false)
     private String issueDnHashMd5;
     @Param(name = "开始日期", required = true)
     private Date startDate;

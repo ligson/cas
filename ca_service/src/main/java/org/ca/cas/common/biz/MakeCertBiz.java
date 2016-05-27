@@ -57,19 +57,21 @@ public class MakeCertBiz {
 
     private X509Certificate gen(String version, SubjectPublicKeyInfo
             subjectPublicKeyInfo, PrivateKey privateKey, X500Name issuer, X500Name subject, BigInteger serial, Date notBefore, Date notAfter, List<Extension> extensionList) {
-        DERObjectIdentifier oid;
+
+        AlgorithmIdentifier algorithmIdentifier = new AlgorithmIdentifier(PKCSObjectIdentifiers.sha1WithRSAEncryption, DERNull.INSTANCE);
+
         if (privateKey.getAlgorithm().equals("SM2")) {
-            oid = new DERObjectIdentifier("1.2.156.10197.1.501");
-        } else {
-            oid = X509Utils.getAlgorithmOID("SHA1withRSA");
+            DERObjectIdentifier oid = new DERObjectIdentifier("1.2.156.10197.1.501");
+            algorithmIdentifier = new AlgorithmIdentifier(oid);
         }
 
-        final DERObjectIdentifier finalOid = oid;
+
+        final AlgorithmIdentifier finalAlg = algorithmIdentifier;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ContentSigner signer = new ContentSigner() {
             @Override
             public AlgorithmIdentifier getAlgorithmIdentifier() {
-                return new AlgorithmIdentifier(finalOid);
+                return finalAlg;
             }
 
             @Override

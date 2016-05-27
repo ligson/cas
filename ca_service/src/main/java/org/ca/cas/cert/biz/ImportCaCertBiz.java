@@ -3,6 +3,7 @@ package org.ca.cas.cert.biz;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
 import org.ca.cas.cert.domain.CertEntity;
 import org.ca.cas.cert.enums.CertFailEnum;
 import org.ca.cas.cert.service.CertService;
@@ -97,7 +98,7 @@ public class ImportCaCertBiz extends AbstractBiz<ImportCaCertRequestDto, ImportC
      * @param container 密钥对容器
      * @return certEntity
      */
-    public CertEntity addCertToEntity(X509Certificate cert, KeyPairContainer container) {
+    public CertEntity addCertToEntity(X509Certificate cert, KeyPairContainer container,String certPin) {
         CertEntity certEntity = new CertEntity();
         certEntity.setSerialNumber(cert.getSerialNumber().toString());
         try {
@@ -127,9 +128,54 @@ public class ImportCaCertBiz extends AbstractBiz<ImportCaCertRequestDto, ImportC
         int days = p.getDays();
         certEntity.setReqOverrideValidity(days);
         certEntity.setApproveDate(new Date());
-        certEntity.setCertPin(requestDto.getCertPin());
+        certEntity.setCertPin(certPin);
         certEntity.setCertType(CertType.SIGN.getCode());
         String csr = csrBiz.genCsr(container, subject);
+        certEntity.setReqBuf(csr);
+        certEntity.setReqBufType(1);
+        certEntity.setSignDate(new Date());
+        return certEntity;
+    }
+
+    /****
+     * x509证书转换未certentity,其中userid和证书链未赋值
+     *
+     * @param cert x509证书
+     * @param csr  密钥对容器
+     * @return certEntity
+     */
+    public CertEntity addCertToEntity(X509Certificate cert, String csr,String certPin) {
+        CertEntity certEntity = new CertEntity();
+        certEntity.setSerialNumber(cert.getSerialNumber().toString());
+        try {
+            certEntity.setSignBuf(Base64.encodeBase64String(cert.getEncoded()));
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+        certEntity.setStatus(CertStatus.VALID.getCode());
+        X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+        X500Name issue = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+        certEntity.setSubjectDn(cert.getSubjectDN().getName());
+        certEntity.setIssuerDn(cert.getIssuerDN().getName());
+        try {
+            certEntity.setIssuerDnHashMd5(DigestUtils.md5Hex(issue.getEncoded()));
+            certEntity.setSubjectDnHashMd5(DigestUtils.md5Hex(subject.getEncoded()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        certEntity.setNotAfter(cert.getNotAfter());
+        certEntity.setNotBefore(cert.getNotBefore());
+        DateTime notAfter = new DateTime(cert.getNotAfter());
+        DateTime notBefore = new DateTime(cert.getNotBefore());
+        //计算区间天数
+        Period p = new Period(notBefore,notAfter, PeriodType.days());
+        int days = p.getDays();
+        certEntity.setReqOverrideValidity(days);
+        certEntity.setApproveDate(new Date());
+        certEntity.setCertPin(certPin);
+        certEntity.setCertType(CertType.SIGN.getCode());
         certEntity.setReqBuf(csr);
         certEntity.setReqBufType(1);
         certEntity.setSignDate(new Date());
@@ -140,7 +186,7 @@ public class ImportCaCertBiz extends AbstractBiz<ImportCaCertRequestDto, ImportC
     public Boolean txnPreProcessing() {
         X509Certificate cert = (X509Certificate) context.getAttr("cert");
         KeyPairContainer container = context.getAttr("certKeyPair", KeyPairContainer.class);
-        CertEntity certEntity = addCertToEntity(cert, container);
+        CertEntity certEntity = addCertToEntity(cert, container,requestDto.getCertPin());
         if (certEntity == null) {
             setFailureResult(CertFailEnum.E_BIZ_21005);
             return false;

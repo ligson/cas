@@ -4,7 +4,7 @@ import org.ca.cas.common.main.Startup;
 import org.springframework.stereotype.Component;
 
 import java.security.PrivateKey;
-import java.security.Provider;
+import java.security.PublicKey;
 import java.security.Signature;
 
 /**
@@ -14,11 +14,12 @@ import java.security.Signature;
 public class SignBiz {
     public byte[] sign(byte[] plainText, String signAlg, PrivateKey privateKey) {
         try {
-            Provider provider = Startup.bouncyCastleProvider;
+            Signature sign;
             if (signAlg.equals("SM3withSM2")) {
-                provider = Startup.TOP_SM_PROVIDER;
+                sign = Signature.getInstance(signAlg, Startup.TOP_SM_PROVIDER);
+            } else {
+                sign = Signature.getInstance(signAlg);
             }
-            Signature sign = Signature.getInstance(signAlg, provider);
             sign.initSign(privateKey);
             sign.update(plainText);
             return sign.sign();
@@ -26,5 +27,22 @@ public class SignBiz {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean verify(byte[] signBuffer, byte[] plainText, String signAlg, PublicKey publicKey) {
+        try {
+            Signature sign;
+            if (signAlg.equals("SM3withSM2")) {
+                sign = Signature.getInstance(signAlg, Startup.TOP_SM_PROVIDER);
+            } else {
+                sign = Signature.getInstance(signAlg);
+            }
+            sign.initVerify(publicKey);
+            sign.update(plainText);
+            return sign.verify(signBuffer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
